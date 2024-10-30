@@ -1,0 +1,353 @@
+path:
+  # --- shared
+  calendar_path: E:\OneDrive\Data\Calendar\cne_calendar.csv
+  root_dir: E:\OneDrive\Data\tushare
+  daily_data_root_dir: E:\OneDrive\Data\tushare\by_date
+  db_struct_path: E:\OneDrive\Data\tushare\db_struct.yaml
+  alternative_dir: E:\OneDrive\Data\Alternative
+  market_index_path: E:\OneDrive\Data\Market\index.xlsx
+  by_instru_pos_dir: E:\OneDrive\Data\tushare\by_instrument\position
+  by_instru_pre_dir: E:\OneDrive\Data\tushare\by_instrument\preprocess
+  by_instru_min_dir: E:\OneDrive\Data\tushare\by_instrument\minute_bar
+
+  # --- project
+  project_root_dir: E:\Data\Projects\CTA_ML_Tushare_V3
+  available_dir: available
+  market_dir: market
+  test_return_dir: test_return
+  factors_by_instru_dir: factors_by_instru
+  factors_aggr_avlb_dir: factors_aggr_avlb
+
+
+mkt_idxes:
+  COM: NH0100.NHF
+  EQT: 881001.WI
+
+universe:
+  AU.SHF:
+    sectorL0: C
+    sectorL1: AUG
+  AG.SHF:
+    sectorL0: C
+    sectorL1: AUG
+  CU.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  AL.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  PB.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  ZN.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  NI.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  SN.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  SS.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  AO.SHF:
+    sectorL0: C
+    sectorL1: MTL
+  A.DCE:
+    sectorL0: C
+    sectorL1: OIL
+  B.DCE:
+    sectorL0: C
+    sectorL1: OIL
+  M.DCE:
+    sectorL0: C
+    sectorL1: OIL
+  P.DCE:
+    sectorL0: C
+    sectorL1: OIL
+  Y.DCE:
+    sectorL0: C
+    sectorL1: OIL
+  OI.ZCE:
+    sectorL0: C
+    sectorL1: OIL
+  RM.ZCE:
+    sectorL0: C
+    sectorL1: OIL
+  RU.SHF:
+    sectorL0: C
+    sectorL1: CHM
+  BR.SHF:
+    sectorL0: C
+    sectorL1: CHM
+  BU.SHF:
+    sectorL0: C
+    sectorL1: CHM
+  FU.SHF:
+    sectorL0: C
+    sectorL1: CHM
+  L.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  V.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  EB.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  EG.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  PP.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  PG.DCE:
+    sectorL0: C
+    sectorL1: CHM
+  MA.ZCE:
+    sectorL0: C
+    sectorL1: CHM
+  TA.ZCE:
+    sectorL0: C
+    sectorL1: CHM
+  PF.ZCE:
+    sectorL0: C
+    sectorL1: CHM
+  PX.ZCE:
+    sectorL0: C
+    sectorL1: CHM
+  RB.SHF:
+    sectorL0: C
+    sectorL1: BLK
+  HC.SHF:
+    sectorL0: C
+    sectorL1: BLK
+  I.DCE:
+    sectorL0: C
+    sectorL1: BLK
+  J.DCE:
+    sectorL0: C
+    sectorL1: BLK
+  JM.DCE:
+    sectorL0: C
+    sectorL1: BLK
+  SF.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  SM.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  ZC.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  AP.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  CF.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  SR.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  CY.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  CJ.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  PK.ZCE:
+    sectorL0: C
+    sectorL1: AGR
+  JD.DCE:
+    sectorL0: C
+    sectorL1: AGR
+  LH.DCE:
+    sectorL0: C
+    sectorL1: AGR
+  C.DCE:
+    sectorL0: C
+    sectorL1: AGR
+  CS.DCE:
+    sectorL0: C
+    sectorL1: AGR
+  RR.DCE:
+    sectorL0: C
+    sectorL1: AGR
+
+  # "UR.ZCE",
+  # "FG.ZCE",
+  # "SA.ZCE",
+  # "SH.ZCE",
+  # "SP.SHF",
+
+available:
+  win: 5
+  amount_threshold: 50000.00 # unit = WANYUAN, >= 50000 WANYUAN, or 500 million
+trn:
+  wins: [ 120, 240 ]
+prd:
+  wins: [ 5, 10 ]
+sim:
+  wins: [ 1 ]
+optimize:
+  win: 20
+  lbd: 0.1
+
+# ------- database structure -------
+db_struct:
+  available:
+    db_name: available.db
+    table:
+      name: available
+      primary_keys:
+        trade_date: TEXT
+        instrument: TEXT
+      value_columns:
+        return: REAL
+        amount: REAL
+        sectorL0: TEXT
+        sectorL1: TEXT
+  market:
+    db_name: market.db
+    table:
+      name: market
+      primary_keys:
+        trade_date: TEXT
+      value_columns:
+        market: REAL
+        C: REAL
+        AUG: REAL
+        MTL: REAL
+        BLK: REAL
+        OIL: REAL
+        CHM: REAL
+        AGR: REAL
+        INH0100_NHF: REAL
+        I881001_WI: REAL
+
+# ------- factors -------
+factors:
+  MTM:
+    wins: [ 120, 240 ]
+  SKEW:
+    wins: [ 120, 240 ]
+  RS:
+    wins: [ 60, 120, 240 ]
+  BASIS:
+    wins: [ 20, 60, 120, 240 ]
+  TS:
+    wins: [ 120, 240 ]
+  S0BETA: # SectorL0
+    wins: [ 20, 60, 120, 240 ]
+  S1BETA: # SectorL1
+    wins: [ 20, 60, 120, 240 ]
+  CBETA: # Currency, forex
+    wins: [ 20, 60, 120, 240 ]
+  IBETA: # Inflation, CPI
+    wins: [ 63, 126, 252 ]
+  PBETA: # PPI
+    wins: [ 63, 126, 252 ]
+  CTP:
+    wins: [ 60 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  CTR:
+    wins: [ 60, 120, 240 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  CVP:
+    wins: [ 60, 120, 240 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  CVR:
+    wins: [ 60, 120, 240 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  CSP:
+    wins: [ 60 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  CSR:
+    wins: [ 60, 120, 240 ]
+    tops: [ 0.1, 0.2, 0.5 ]
+  NOI:
+    wins: [ 20, 60 ]
+    tops: [ 5 ]
+  NDOI:
+    wins: [ 20, 60 ]
+    tops: [ 5 ]
+  WNOI:
+    wins: [ 20, 60, 120, 240 ]
+    tops: [ 5 ]
+  WNDOI:
+    wins: [ 20, 60, 120, 240 ]
+    tops: [ 5 ]
+  AMP:
+    wins: [ 60 ]
+    lbds: [ 0.3, 0.6, 0.9 ]
+  EXR:
+    wins: [ 20, 60 ]
+    dfts: [ 3 ]
+  SMT:
+    lbds: [ 0.4, 0.6 ]
+  RWTC:
+    wins: [ 5, 10, 20 ]
+  TA:
+    macd: [ 10, 20, 7 ]
+    bbands: [ 10, 2, 2 ]
+    sar: [ 0.02, 0.2 ]
+    adx: 10
+    bop: None
+    cci: 10
+    cmo: 10
+    rsi: 10
+    mfi: 10
+    willr: 10
+    adosc: [ 3, 10 ]
+    obv: 10
+    natr: 10
+
+factor_groups:
+  MTM: [ MTM ]
+  SKEW: [ SKEW ]
+  STOCK: [ RS ]
+  BASIS: [ BASIS ]
+  TS: [ TS ]
+  BETA: [ S0BETA, S1BETA, CBETA, IBETA, PBETA ]
+  TURNOVER: [ CTP, CSP ]
+  POSITION: [ NOI, NDOI ]
+  HFT: [ AMP, EXR, SMT, RWTC ]
+  TA: [ TA ]
+
+  #  G0: [
+  #    MTM, SKEW, RS, BASIS, TS,
+  #    S0BETA, S1BETA, CBETA, IBETA, PBETA,
+  #    CTP, CVP, CSP,
+  #    NOI, NDOI,
+  #    AMP, EXR, SMT, RWTC,
+  #    TA
+  #  ]
+
+# ------- models -------
+cv: 5
+mclrn:
+  #  Ridge:
+  #    alpha: [ 100, 500, 1000, 5000 ]
+  LGBM:
+    boosting_type: [ "gbdt" ]
+    n_estimators: [ 3, 5, 10 ]
+    max_depth: [ 3 ]
+    num_leaves: [ 2, 4, 8 ]
+    learning_rate: [ 0.01, 0.05, 0.1 ]
+    metric: [ "l2" ]
+  #  XGB:
+  #    booster: [ "dart" ] # ["gbtree", "gblinear", "dart"]
+  #    n_estimators: [ 3, 5, 10 ]
+  #    max_depth: [ 3 ]
+  #    max_leaves: [ 2, 4, 8 ]
+  #    learning_rate: [ 0.01, 0.05, 0.1 ]
+  #    objective: [ "reg:squarederror" ]
+  #    grow_policy: [ "lossguide" ] # ["depthwise", "lossguide"]
+
+# ------- const -------
+CONST:
+  COST: 0.0003
+  COST_SUB: 0.0
+  SECTORS: [ "AUG", "MTL", "BLK", "OIL", "CHM", "AGR" ]
+  LAG: 1
