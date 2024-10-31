@@ -1,7 +1,7 @@
 import os
 import yaml
 from husfort.qsqlite import CDbStruct, CSqlTable
-from typedef import TUniverse, TInstruName, CCfgInstru, CCfgAvlbUnvrs, CCfgConst, CCfgTrn, CCfgPrd, CCfgSim
+from typedef import TUniverse, TInstruName, CCfgInstru, CCfgAvlbUnvrs, CCfgConst, CCfgTrn, CCfgPrd, CCfgSim, CCfgDecay
 from typedef import CCfgProj, CCfgDbStruct
 from typedef import (
     CCfgFactors,
@@ -76,6 +76,7 @@ proj_cfg = CCfgProj(
     trn=CCfgTrn(**_config["trn"]),
     prd=CCfgPrd(**_config["prd"]),
     sim=CCfgSim(**_config["sim"]),
+    decay=CCfgDecay(**_config["decay"]),
     optimize=_config["optimize"],
     factors=_config["factors"],
     factor_groups=_config["factor_groups"],

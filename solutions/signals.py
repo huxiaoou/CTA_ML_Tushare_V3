@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import multiprocessing as mp
 from itertools import product
@@ -66,21 +67,28 @@ class _CSignal:
         return data[["trade_date", "instrument", "weight"]]
 
     @staticmethod
-    def moving_average_signal(signal_data: pd.DataFrame, bgn_date: str, maw: int) -> pd.DataFrame:
+    def moving_average_signal(
+            signal_data: pd.DataFrame, bgn_date: str, decay_rate: float, decay_win: int
+    ) -> pd.DataFrame:
         """
 
         :param signal_data: pd.Dataframe with columns = ["trade_date", "instrument", "weight"]
         :param bgn_date:
-        :param maw:
+        :param decay_rate:
+        :param decay_win:
         :return:
         """
+        rou = np.power(decay_rate, 1 / decay_win)  # rou **decay_win = decay_rate
+        w = np.power(rou, np.arange(decay_win, 0, -1))
+        w = w / w.sum()
+
         pivot_data = pd.pivot_table(
             data=signal_data,
             index=["trade_date"],
             columns=["instrument"],
             values=["weight"],
         )
-        instru_ma_data = pivot_data.fillna(0).rolling(window=maw).mean()
+        instru_ma_data = pivot_data.fillna(0).rolling(window=decay_win).apply(lambda z: z @ w)
         truncated_data = instru_ma_data.query(f"trade_date >= '{bgn_date}'")
         normalize_data = truncated_data.div(truncated_data.abs().sum(axis=1), axis=0).fillna(0)
         stack_data = normalize_data.stack(future_stack=True).reset_index()
@@ -95,15 +103,16 @@ class _CSignal:
 
 
 class CSignalFromFactor(_CSignal):
-    def __init__(self, factor: CFactor, factor_save_root_dir: str, signal_save_dir: str, maw: int):
+    def __init__(self, factor: CFactor, factor_save_root_dir: str, signal_save_dir: str,
+                 decay_rate: float, decay_win: int):
         self.factor = factor
         self.factor_save_root_dir = factor_save_root_dir
-        self.maw = maw
-        signal_id = f"{factor.factor_name}.MA{self.maw:02d}"
+        self.decay_rate, self.decay_win = decay_rate, decay_win
+        signal_id = factor.factor_name
         super().__init__(signal_save_dir=signal_save_dir, signal_id=signal_id)
 
     def load_input(self, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
-        base_bgn_date = calendar.get_next_date(bgn_date, -self.maw + 1)
+        base_bgn_date = calendar.get_next_date(bgn_date, -self.decay_win + 1)
         db_struct_fac = gen_fac_agg_db(
             db_save_root_dir=self.factor_save_root_dir,
             factor_class=self.factor.factor_class,
@@ -127,15 +136,19 @@ class CSignalFromFactor(_CSignal):
         )
         grouped_data = sorted_data.groupby(by=["trade_date"], group_keys=False)
         signal_data = grouped_data.apply(self.map_factor_to_signal)
-        signal_data_ma = self.moving_average_signal(signal_data, bgn_date=bgn_date, maw=self.maw)
+        signal_data_ma = self.moving_average_signal(
+            signal_data, bgn_date=bgn_date, decay_rate=self.decay_rate, decay_win=self.decay_win)
         return signal_data_ma
 
 
 def process_for_signal_from_factor_agg(
-        factor: CFactor, factor_save_root_dir: str, maw: int, signal_save_dir: str,
+        factor: CFactor, factor_save_root_dir: str,
+        decay_rate: float, decay_win: int,
+        signal_save_dir: str,
         bgn_date: str, stp_date: str, calendar: CCalendar,
 ):
-    signal = CSignalFromFactor(factor, factor_save_root_dir, signal_save_dir, maw=maw)
+    signal = CSignalFromFactor(
+        factor, factor_save_root_dir, signal_save_dir, decay_rate=decay_rate, decay_win=decay_win)
     signal.main(bgn_date, stp_date, calendar)
     return 0
 
@@ -143,7 +156,8 @@ def process_for_signal_from_factor_agg(
 def main_signals_from_factor_agg(
         factors: TFactors,
         factor_save_root_dir: str,
-        maws: list[int],
+        decay_rate: float,
+        decay_win: int,
         signal_save_dir: str,
         bgn_date: str,
         stp_date: str,
@@ -152,18 +166,18 @@ def main_signals_from_factor_agg(
         processes: int,
 ):
     desc = "Translating factors to signals ..."
-    iter_args = product(factors, maws)
     if call_multiprocess:
         with Progress() as pb:
             main_task = pb.add_task(description=desc, total=len(factors))
             with mp.get_context("spawn").Pool(processes) as pool:
-                for factor, maw in iter_args:
+                for factor in factors:
                     pool.apply_async(
                         process_for_signal_from_factor_agg,
                         kwds={
                             "factor": factor,
                             "factor_save_root_dir": factor_save_root_dir,
-                            "maw": maw,
+                            "decay_rate": decay_rate,
+                            "decay_win": decay_win,
                             "signal_save_dir": signal_save_dir,
                             "bgn_date": bgn_date,
                             "stp_date": stp_date,
@@ -175,18 +189,18 @@ def main_signals_from_factor_agg(
                 pool.close()
                 pool.join()
     else:
-        for factor, maw in track(list(iter_args), description=desc):
+        for factor in track(factors, description=desc):
             process_for_signal_from_factor_agg(
                 factor=factor,
                 factor_save_root_dir=factor_save_root_dir,
-                maw=maw,
+                decay_rate=decay_rate,
+                decay_win=decay_win,
                 signal_save_dir=signal_save_dir,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,
             )
     return 0
-
 
 # """
 # -------------------------------------

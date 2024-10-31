@@ -62,10 +62,9 @@ class CEvlFacAgg(CEvlFrmSim):
     """
 
     def add_arguments(self, res: dict):
-        factor_name, maw, ret_name = self.sim_args.sim_id.split(".")
+        factor_name, ret_name = self.sim_args.sim_id.split(".")
         other_arguments = {
             "factor_name": factor_name,
-            "maw": maw,
             "ret_name": ret_name,
         }
         res.update(other_arguments)

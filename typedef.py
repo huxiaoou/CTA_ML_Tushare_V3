@@ -686,7 +686,7 @@ class CSimArgs:
     cost: float
 
 
-TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc, str]
+TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc]
 TSimGrpIdByFacGrp = tuple[TGroupId, TRetPrc]
 
 """
@@ -761,6 +761,12 @@ class CCfgSim:
 
 
 @dataclass(frozen=True)
+class CCfgDecay:
+    win: int
+    rate: float
+
+
+@dataclass(frozen=True)
 class CCfgConst:
     COST: float
     COST_SUB: float
@@ -799,6 +805,7 @@ class CCfgProj:
     trn: CCfgTrn
     prd: CCfgPrd
     sim: CCfgSim
+    decay: CCfgDecay
     optimize: dict
     factors: dict
     factor_groups: dict[TGroupId, list[TFactorClass]]

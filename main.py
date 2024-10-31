@@ -417,7 +417,8 @@ if __name__ == "__main__":
             main_signals_from_factor_agg(
                 factors=factors,
                 factor_save_root_dir=proj_cfg.factors_aggr_avlb_dir,
-                maws=proj_cfg.prd.wins,
+                decay_rate=proj_cfg.decay.rate,
+                decay_win=proj_cfg.decay.win,
                 signal_save_dir=proj_cfg.sig_frm_fac_agg_dir,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
@@ -435,7 +436,6 @@ if __name__ == "__main__":
 
             sim_args_list = get_sim_args_fac(
                 factors=cfg_factors.get_factors(),
-                maws=proj_cfg.prd.wins,
                 rets=proj_cfg.get_test_rets(),
                 signals_dir=proj_cfg.sig_frm_fac_agg_dir,
                 ret_dir=proj_cfg.test_return_dir,
@@ -460,7 +460,6 @@ if __name__ == "__main__":
 
             sim_args_list = get_sim_args_fac(
                 factors=cfg_factors.get_factors(),
-                maws=proj_cfg.prd.wins,
                 rets=proj_cfg.get_test_rets(),
                 signals_dir=proj_cfg.sig_frm_fac_agg_dir,
                 ret_dir=proj_cfg.test_return_dir,

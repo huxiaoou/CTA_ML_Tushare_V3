@@ -196,12 +196,10 @@ def gen_opt_wgt_db(db_save_dir: str, save_id: str, underlying_assets_names: list
 # ------ arguments about simulations ------
 # -----------------------------------------
 
-def get_sim_args_fac(
-        factors: TFactors, maws: list[int], rets: TRets, signals_dir: str, ret_dir: str, cost: float,
-) -> list[CSimArgs]:
+def get_sim_args_fac(factors: TFactors, rets: TRets, signals_dir: str, ret_dir: str, cost: float) -> list[CSimArgs]:
     res: list[CSimArgs] = []
-    for factor, maw, ret in ittl.product(factors, maws, rets):
-        signal_id = f"{factor.factor_name}.MA{maw:02d}"
+    for factor, ret in ittl.product(factors, rets):
+        signal_id = factor.factor_name
         ret_names = [ret.ret_name]
         sim_args = CSimArgs(
             sim_id=f"{signal_id}.{ret.ret_name}",
@@ -219,10 +217,10 @@ def group_sim_args_by_factor_class(
 ) -> dict[TSimGrpIdByFacAgg, list[CSimArgs]]:
     res: dict[TSimGrpIdByFacAgg, list[CSimArgs]] = {}
     for sim_args in sim_args_list:
-        factor_name, maw, ret_name = sim_args.sim_id.split(".")
+        factor_name, ret_name = sim_args.sim_id.split(".")
         factor_class = mapper_name_to_class[TFactorName(factor_name)]
         ret_prc = ret_name[0:3]
-        key = TSimGrpIdByFacAgg((factor_class, ret_prc, maw))
+        key = TSimGrpIdByFacAgg((factor_class, ret_prc))
         if key not in res:
             res[key] = []
         res[key].append(sim_args)

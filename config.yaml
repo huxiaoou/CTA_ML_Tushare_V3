@@ -193,6 +193,9 @@ prd:
   wins: [ 5, 10 ]
 sim:
   wins: [ 1 ]
+decay:
+  rate: 0.3
+  win: 10
 optimize:
   win: 20
   lbd: 0.1
