@@ -9,10 +9,6 @@ from typedef import TSimGrpIdByFacNeu, TSimGrpIdByFacGrp
 from typedef import CTestMdl, CRet, CModel, TFactorGroups
 
 
-def convert_mkt_idx(mkt_idx: str, prefix: str = "I") -> str:
-    return f"{prefix}{mkt_idx.replace('.', '_')}"
-
-
 # ---------------------------------------
 # ------ algorithm: neutralization ------
 # ---------------------------------------

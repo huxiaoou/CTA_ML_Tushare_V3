@@ -4,7 +4,10 @@ from loguru import logger
 from husfort.qutility import check_and_makedirs
 from husfort.qcalendar import CCalendar
 from husfort.qsqlite import CDbStruct, CMgrSqlDb
-from solutions.shared import convert_mkt_idx
+
+
+def convert_mkt_idx(mkt_idx: str, prefix: str = "I") -> str:
+    return f"{prefix}{mkt_idx.replace('.', '_')}"
 
 
 def load_available(db_struct: CDbStruct, bgn_date: str, stp_date: str) -> pd.DataFrame:
@@ -94,7 +97,6 @@ def main_market(
         table=db_struct_mkt.table,
         mode="a",
     )
-
     if sqldb.check_continuity(bgn_date, calendar) == 0:
         ret_by_sector = cal_market_return(bgn_date, stp_date, db_struct_avlb, sectors=sectors)
         mkt_idx_df = load_market_index(bgn_date, stp_date, path_mkt_idx_data, mkt_idxes)

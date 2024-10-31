@@ -80,18 +80,18 @@ if __name__ == "__main__":
             db_struct_avlb=db_struct_cfg.available,
             calendar=calendar,
         )
-    # elif args.switch == "market":
-    #     from solutions.market import main_market
-    #
-    #     main_market(
-    #         bgn_date=bgn_date, stp_date=stp_date,
-    #         calendar=calendar,
-    #         db_struct_avlb=db_struct_cfg.available,
-    #         db_struct_mkt=db_struct_cfg.market,
-    #         path_mkt_idx_data=proj_cfg.market_index_path,
-    #         mkt_idxes=list(proj_cfg.mkt_idxes.values()),
-    #         sectors=proj_cfg.const.SECTORS,
-    #     )
+    elif args.switch == "market":
+        from solutions.market import main_market
+
+        main_market(
+            bgn_date=bgn_date, stp_date=stp_date,
+            calendar=calendar,
+            db_struct_avlb=db_struct_cfg.available,
+            db_struct_mkt=db_struct_cfg.market,
+            path_mkt_idx_data=proj_cfg.market_index_path,
+            mkt_idxes=list(proj_cfg.mkt_idxes.values()),
+            sectors=proj_cfg.const.SECTORS,
+        )
     # elif args.switch == "test_return":
     #     from solutions.test_return import CTstRetRaw, CTstRetAgg
     #
