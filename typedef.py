@@ -683,9 +683,10 @@ class CSimArgs:
     tgt_ret: CRet
     db_struct_sig: CDbStruct
     db_struct_ret: CDbStruct
+    cost: float
 
 
-TSimGrpIdByFacNeu = tuple[TFactorClass, TRetPrc, str]
+TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc, str]
 TSimGrpIdByFacGrp = tuple[TGroupId, TRetPrc]
 
 """
@@ -786,6 +787,9 @@ class CCfgProj:
     test_return_dir: str
     factors_by_instru_dir: str
     factors_aggr_avlb_dir: str
+    sig_frm_fac_agg_dir: str
+    sim_frm_fac_agg_dir: str
+    evl_frm_fac_agg_dir: str
 
     # --- project parameters
     universe: TUniverse

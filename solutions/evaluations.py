@@ -7,7 +7,7 @@ from husfort.qevaluation import CNAV
 from husfort.qsqlite import CMgrSqlDb, CDbStruct
 from husfort.qplot import CPlotLines
 from solutions.shared import gen_nav_db
-from typedef import CSimArgs, TSimGrpIdByFacNeu, TSimGrpIdByFacGrp, TRetPrc
+from typedef import CSimArgs, TSimGrpIdByFacAgg, TSimGrpIdByFacGrp, TRetPrc
 
 
 class CEvl:
@@ -56,7 +56,7 @@ class CEvlFrmSim(CEvl):
         super().__init__(db_struct_nav)
 
 
-class CEvlFacNeu(CEvlFrmSim):
+class CEvlFacAgg(CEvlFrmSim):
     """
     --- evaluations for neutralized factors ---
     """
@@ -130,8 +130,8 @@ def process_for_evl_frm_sim(
         bgn_date: str,
         stp_date: str,
 ) -> dict:
-    if sim_type == "facNeu":
-        s = CEvlFacNeu(sim_args, sim_save_dir=sim_save_dir)
+    if sim_type == "facAgg":
+        s = CEvlFacAgg(sim_args, sim_save_dir=sim_save_dir)
     elif sim_type == "mdlPrd":
         s = CEvlMdlPrd(sim_args, sim_save_dir=sim_save_dir)
     elif sim_type == "mdlOpt":
@@ -229,7 +229,7 @@ def plot_sim_args_list(
 
 
 def main_plt_grouped_sim_args(
-        grouped_sim_args: dict[TSimGrpIdByFacNeu | TSimGrpIdByFacGrp | TRetPrc, list[CSimArgs]],
+        grouped_sim_args: dict[TSimGrpIdByFacAgg | TSimGrpIdByFacGrp | TRetPrc, list[CSimArgs]],
         sim_save_dir: str,
         plt_save_dir: str,
         bgn_date: str,

@@ -17,6 +17,9 @@ path:
   test_return_dir: test_return
   factors_by_instru_dir: factors_by_instru
   factors_aggr_avlb_dir: factors_aggr_avlb
+  sig_frm_fac_agg_dir: sig_frm_fac_agg
+  sim_frm_fac_agg_dir: sim_frm_fac_agg
+  evl_frm_fac_agg_dir: evl_frm_fac_agg
 
 
 mkt_idxes:

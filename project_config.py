@@ -61,6 +61,13 @@ proj_cfg = CCfgProj(
     factors_aggr_avlb_dir=os.path.join(  # type:ignore
         _config["path"]["project_root_dir"], _config["path"]["factors_aggr_avlb_dir"]),
 
+    sig_frm_fac_agg_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sig_frm_fac_agg_dir"]),
+    sim_frm_fac_agg_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sim_frm_fac_agg_dir"]),
+    evl_frm_fac_agg_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["evl_frm_fac_agg_dir"]),
+
     universe=universe,
     avlb_unvrs=CCfgAvlbUnvrs(**_config["available"]),
     mkt_idxes=_config["mkt_idxes"],

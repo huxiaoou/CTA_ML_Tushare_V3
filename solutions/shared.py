@@ -5,7 +5,7 @@ import itertools as ittl
 from rich.progress import Progress
 from husfort.qsqlite import CDbStruct, CSqlTable, CSqlVar
 from typedef import TFactorClass, TFactorName, TFactorNames, TFactors, CSimArgs, TRets, TUniqueId, TGroupId, TRetPrc
-from typedef import TSimGrpIdByFacNeu, TSimGrpIdByFacGrp
+from typedef import TSimGrpIdByFacAgg, TSimGrpIdByFacGrp
 from typedef import CTestMdl, CRet, CModel, TFactorGroups
 
 
@@ -197,7 +197,7 @@ def gen_opt_wgt_db(db_save_dir: str, save_id: str, underlying_assets_names: list
 # -----------------------------------------
 
 def get_sim_args_fac(
-        factors: TFactors, maws: list[int], rets: TRets, signals_dir: str, ret_dir: str,
+        factors: TFactors, maws: list[int], rets: TRets, signals_dir: str, ret_dir: str, cost:float,
 ) -> list[CSimArgs]:
     res: list[CSimArgs] = []
     for factor, maw, ret in ittl.product(factors, maws, rets):
@@ -208,6 +208,7 @@ def get_sim_args_fac(
             tgt_ret=ret,
             db_struct_sig=gen_sig_db(db_save_dir=signals_dir, signal_id=signal_id),
             db_struct_ret=gen_tst_ret_agg_db(db_save_root_dir=ret_dir, save_id=ret.save_id, rets=ret_names),
+            cost=cost,
         )
         res.append(sim_args)
     return res
@@ -215,13 +216,13 @@ def get_sim_args_fac(
 
 def group_sim_args_by_factor_class(
         sim_args_list: list[CSimArgs], mapper_name_to_class: dict[TFactorName, TFactorClass],
-) -> dict[TSimGrpIdByFacNeu, list[CSimArgs]]:
-    res: dict[TSimGrpIdByFacNeu, list[CSimArgs]] = {}
+) -> dict[TSimGrpIdByFacAgg, list[CSimArgs]]:
+    res: dict[TSimGrpIdByFacAgg, list[CSimArgs]] = {}
     for sim_args in sim_args_list:
         factor_name, maw, ret_name = sim_args.sim_id.split(".")
         factor_class = mapper_name_to_class[TFactorName(factor_name)]
         ret_prc = ret_name[0:3]
-        key = TSimGrpIdByFacNeu((factor_class, ret_prc, maw))
+        key = TSimGrpIdByFacAgg((factor_class, ret_prc, maw))
         if key not in res:
             res[key] = []
         res[key].append(sim_args)

@@ -44,15 +44,15 @@ def parse_args():
 
     # switch: signals
     arg_parser_sub = arg_parser_subs.add_parser(name="signals", help="generate signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("fac",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
 
     # switch: simulations
     arg_parser_sub = arg_parser_subs.add_parser(name="simulations", help="simulate from signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("fac",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
 
     # switch: evaluations
     arg_parser_sub = arg_parser_subs.add_parser(name="evaluations", help="evaluate simulations")
-    arg_parser_sub.add_argument("--type", type=str, choices=("fac",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
 
     return arg_parser.parse_args()
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
                 db_tst_ret_save_dir=proj_cfg.test_return_dir,
                 db_struct_avlb=db_struct_cfg.available,
             )
-            tst_ret_agg.main_test_return_neu(
+            tst_ret_agg.main_test_return_agg(
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,
@@ -400,95 +400,95 @@ if __name__ == "__main__":
                 call_multiprocess=not args.nomp, processes=args.processes,
             )
 
-            # --- Neutralization
-            neutralizer = CFactorAgg(
+            # --- aggregation
+            aggregator = CFactorAgg(
                 ref_factor=fac,
                 universe=proj_cfg.universe,
                 db_struct_preprocess=db_struct_cfg.preprocess,
                 db_struct_avlb=db_struct_cfg.available,
                 factors_aggr_avlb_dir=proj_cfg.factors_aggr_avlb_dir,
             )
-            neutralizer.main_agg(bgn_date=bgn_date, stp_date=stp_date, calendar=calendar)
-    # elif args.switch == "signals":
-    #     if args.type == "fac":
-    #         from solutions.signals import main_signals_from_factor_neu
-    #
-    #         factors = cfg_factors.get_factors()
-    #         main_signals_from_factor_neu(
-    #             factors=factors,
-    #             factor_save_root_dir=proj_cfg.neutral_by_instru_dir,
-    #             maws=proj_cfg.prd.wins,
-    #             signal_save_dir=proj_cfg.sig_frm_fac_neu_dir,
-    #             bgn_date=bgn_date,
-    #             stp_date=stp_date,
-    #             calendar=calendar,
-    #             call_multiprocess=not args.nomp,
-    #             processes=args.processes,
-    #         )
-    #     else:
-    #         raise ValueError(f"args.type == {args.type} is illegal")
-    # elif args.switch == "simulations":
-    #     from solutions.simulations import main_simulations
-    #
-    #     if args.type == "facNeu":
-    #         from solutions.shared import get_sim_args_fac_neu
-    #
-    #         sim_args_list = get_sim_args_fac_neu(
-    #             factors=cfg_factors.get_factors_neu(),
-    #             maws=proj_cfg.prd.wins,
-    #             rets=proj_cfg.get_raw_test_rets(),
-    #             signals_dir=proj_cfg.sig_frm_fac_neu_dir,
-    #             ret_dir=proj_cfg.test_return_dir,
-    #             cost=proj_cfg.const.COST_SUB,
-    #         )
-    #         main_simulations(
-    #             sim_args_list=sim_args_list,
-    #             sim_save_dir=proj_cfg.sim_frm_fac_neu_dir,
-    #             bgn_date=bgn_date,
-    #             stp_date=stp_date,
-    #             calendar=calendar,
-    #             call_multiprocess=not args.nomp,
-    #             processes=args.processes,
-    #         )
-    #     else:
-    #         raise ValueError(f"args.type == {args.type} is illegal")
-    # elif args.switch == "evaluations":
-    #     from solutions.evaluations import main_evl_sims, main_plt_grouped_sim_args, plot_sim_args_list
-    #
-    #     if args.type == "fac":
-    #         from solutions.shared import get_sim_args_fac_neu, group_sim_args_by_factor_class
-    #
-    #         sim_args_list = get_sim_args_fac_neu(
-    #             factors=cfg_factors.get_factors_neu(),
-    #             maws=proj_cfg.prd.wins,
-    #             rets=proj_cfg.get_raw_test_rets(),
-    #             signals_dir=proj_cfg.sig_frm_fac_neu_dir,
-    #             ret_dir=proj_cfg.test_return_dir,
-    #             cost=proj_cfg.const.COST_SUB,
-    #         )
-    #         main_evl_sims(
-    #             sim_type=args.type,
-    #             sim_args_list=sim_args_list,
-    #             sim_save_dir=proj_cfg.sim_frm_fac_neu_dir,
-    #             evl_save_dir=proj_cfg.evl_frm_fac_neu_dir,
-    #             evl_save_file="evaluations_for_fac_neu.csv.gz",
-    #             header_vars=["sharpe", "calmar", "sharpe+calmar"],
-    #             sort_vars=["sharpe"],
-    #             bgn_date=bgn_date,
-    #             stp_date=stp_date,
-    #             call_multiprocess=not args.nomp,
-    #             processes=args.processes,
-    #         )
-    #         # plot by group
-    #         grouped_sim_args = group_sim_args_by_factor_class(sim_args_list, cfg_factors.get_mapper_name_to_class_neu())
-    #         main_plt_grouped_sim_args(
-    #             grouped_sim_args=grouped_sim_args,
-    #             sim_save_dir=proj_cfg.sim_frm_fac_neu_dir,
-    #             plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_neu_dir, "plot-nav"),
-    #             bgn_date=bgn_date,
-    #             stp_date=stp_date,
-    #         )
-    #     else:
-    #         raise ValueError(f"args.type == {args.type} is illegal")
+            aggregator.main_agg(bgn_date=bgn_date, stp_date=stp_date, calendar=calendar)
+    elif args.switch == "signals":
+        if args.type == "facAgg":
+            from solutions.signals import main_signals_from_factor_agg
+
+            factors = cfg_factors.get_factors()
+            main_signals_from_factor_agg(
+                factors=factors,
+                factor_save_root_dir=proj_cfg.factors_aggr_avlb_dir,
+                maws=proj_cfg.prd.wins,
+                signal_save_dir=proj_cfg.sig_frm_fac_agg_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+        else:
+            raise ValueError(f"args.type == {args.type} is illegal")
+    elif args.switch == "simulations":
+        from solutions.simulations import main_simulations
+
+        if args.type == "facAgg":
+            from solutions.shared import get_sim_args_fac
+
+            sim_args_list = get_sim_args_fac(
+                factors=cfg_factors.get_factors(),
+                maws=proj_cfg.prd.wins,
+                rets=proj_cfg.get_test_rets(),
+                signals_dir=proj_cfg.sig_frm_fac_agg_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_simulations(
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_fac_agg_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+        else:
+            raise ValueError(f"args.type == {args.type} is illegal")
+    elif args.switch == "evaluations":
+        from solutions.evaluations import main_evl_sims, main_plt_grouped_sim_args, plot_sim_args_list
+
+        if args.type == "facAgg":
+            from solutions.shared import get_sim_args_fac, group_sim_args_by_factor_class
+
+            sim_args_list = get_sim_args_fac(
+                factors=cfg_factors.get_factors(),
+                maws=proj_cfg.prd.wins,
+                rets=proj_cfg.get_test_rets(),
+                signals_dir=proj_cfg.sig_frm_fac_agg_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_evl_sims(
+                sim_type=args.type,
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_fac_agg_dir,
+                evl_save_dir=proj_cfg.evl_frm_fac_agg_dir,
+                evl_save_file="evaluations_for_fac_agg.csv.gz",
+                header_vars=["sharpe", "calmar", "sharpe+calmar"],
+                sort_vars=["sharpe"],
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+            # plot by group
+            grouped_sim_args = group_sim_args_by_factor_class(sim_args_list, cfg_factors.get_mapper_name_to_class())
+            main_plt_grouped_sim_args(
+                grouped_sim_args=grouped_sim_args,
+                sim_save_dir=proj_cfg.sim_frm_fac_agg_dir,
+                plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_agg_dir, "plot-nav"),
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+            )
+        else:
+            raise ValueError(f"args.type == {args.type} is illegal")
     else:
         raise ValueError(f"args.switch = {args.switch} is illegal")

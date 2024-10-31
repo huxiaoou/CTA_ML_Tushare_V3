@@ -190,7 +190,7 @@ class CTstRetAgg(_CTstRet):
             sqldb.update(update_data=instru_tst_ret_agg_data)
         return 0
 
-    def main_test_return_neu(self, bgn_date: str, stp_date: str, calendar: CCalendar):
+    def main_test_return_agg(self, bgn_date: str, stp_date: str, calendar: CCalendar):
         logger.info(f"Aggregating test return with lag = {SFG(self.lag)}, win = {SFG(self.win)}")
         iter_dates = calendar.get_iter_list(bgn_date, stp_date)
         base_bgn_date = self.get_base_date(iter_dates[0], calendar)
