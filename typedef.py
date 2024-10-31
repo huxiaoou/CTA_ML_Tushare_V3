@@ -722,6 +722,9 @@ class CCfgProj:
     sim_frm_fac_agg_dir: str
     evl_frm_fac_agg_dir: str
     opt_frm_slc_fac_dir: str
+    sig_frm_fac_opt_dir: str
+    sim_frm_fac_opt_dir: str
+    evl_frm_fac_opt_dir: str
 
     # --- project parameters
     universe: TUniverse

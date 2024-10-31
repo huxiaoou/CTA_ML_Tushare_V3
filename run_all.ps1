@@ -3,9 +3,6 @@ $bgn_date_sig = "20170703" # signal bgn date
 $bgn_date_sim = "20180102" # simulation bgn date
 $stp_date = "20241008"
 
-$bgn_date_ml = "20170201" # machine learning bgn date
-$bgn_date_mdl_prd = "20170301"
-$bgn_date_mdl_opt = "20170405"
 
 # ------------------------
 # --- remove existence ---
@@ -54,4 +51,9 @@ python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type facAgg
 python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type facAgg
 
 # --- optimize for selected factors
-python main.py --bgn $bgn_date_mdl_prd --stp $stp_date optimize --type slcFac
+python main.py --bgn $bgn_date_sig --stp $stp_date optimize --type slcFac
+
+# --- signals, simulations and evaluations for optimized factors
+python main.py --bgn $bgn_date_sig --stp $stp_date signals --type facOpt
+python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type facOpt
+python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type facOpt

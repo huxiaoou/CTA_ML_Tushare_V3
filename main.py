@@ -44,15 +44,15 @@ def parse_args():
 
     # switch: signals
     arg_parser_sub = arg_parser_subs.add_parser(name="signals", help="generate signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
 
     # switch: simulations
     arg_parser_sub = arg_parser_subs.add_parser(name="simulations", help="simulate from signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
 
     # switch: evaluations
     arg_parser_sub = arg_parser_subs.add_parser(name="evaluations", help="evaluate simulations")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
 
     # switch: optimize
     arg_parser_sub = arg_parser_subs.add_parser(name="optimize", help="optimize portfolio and signals")
@@ -424,6 +424,28 @@ if __name__ == "__main__":
                 decay_rate=proj_cfg.decay.rate,
                 decay_win=proj_cfg.decay.win,
                 signal_save_dir=proj_cfg.sig_frm_fac_agg_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+        elif args.type == "facOpt":
+            from solutions.shared import group_sim_args_from_slc_fac
+            from solutions.signals import main_signals_from_opt
+
+            grouped_sim_args = group_sim_args_from_slc_fac(
+                factor_names=proj_cfg.selected_factors_pool,
+                rets=proj_cfg.get_test_rets(),
+                signals_dir=proj_cfg.sig_frm_fac_agg_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_signals_from_opt(
+                grouped_sim_args=grouped_sim_args,
+                input_sig_dir=proj_cfg.sig_frm_fac_agg_dir,
+                input_opt_dir=proj_cfg.opt_frm_slc_fac_dir,
+                signal_save_dir=proj_cfg.sig_frm_fac_opt_dir,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,

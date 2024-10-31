@@ -70,6 +70,13 @@ proj_cfg = CCfgProj(
     opt_frm_slc_fac_dir=os.path.join(  # type:ignore
         _config["path"]["project_root_dir"], _config["path"]["opt_frm_slc_fac_dir"]),
 
+    sig_frm_fac_opt_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sig_frm_fac_opt_dir"]),
+    sim_frm_fac_opt_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sim_frm_fac_opt_dir"]),
+    evl_frm_fac_opt_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["evl_frm_fac_opt_dir"]),
+
     universe=universe,
     avlb_unvrs=CCfgAvlbUnvrs(**_config["available"]),
     mkt_idxes=_config["mkt_idxes"],

@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
-from itertools import product
 from rich.progress import Progress, track
 from husfort.qutility import check_and_makedirs, error_handler
 from husfort.qsqlite import CMgrSqlDb
 from husfort.qcalendar import CCalendar
-from solutions.shared import gen_sig_db, gen_fac_agg_db, gen_prdct_db, gen_opt_wgt_db
-from typedef import CFactor, TFactors, TFactorNames, CSimArgs, TSimGrpIdByFacGrp, TRetPrc
-from typedef import CTestMdl
+from solutions.shared import gen_sig_db, gen_fac_agg_db, gen_opt_wgt_db
+from typedef import CFactor, TFactors, TFactorNames, CSimArgs, TRetPrc
 
 
 class _CSignal:
@@ -202,237 +200,140 @@ def main_signals_from_factor_agg(
             )
     return 0
 
-# """
-# -------------------------------------
-# --- signals from model prediction ---
-# -------------------------------------
-# """
-#
-#
-# class CSignalFromMdlPrd(_CSignal):
-#     def __init__(self, test: CTestMdl, mclrn_prd_dir: str, signal_save_dir: str):
-#         self.test = test
-#         self.mclrn_prd_dir = mclrn_prd_dir
-#         self.maw = test.ret.win
-#         signal_id = f"{test.save_tag_mdl}.MA{self.maw:02d}"
-#         super().__init__(signal_save_dir=signal_save_dir, signal_id=signal_id)
-#
-#     def load_input(self, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
-#         base_bgn_date = calendar.get_next_date(bgn_date, -self.maw + 1)
-#         db_struct_prd = gen_prdct_db(db_save_root_dir=self.mclrn_prd_dir, test=self.test)
-#         sqldb = CMgrSqlDb(
-#             db_save_dir=db_struct_prd.db_save_dir,
-#             db_name=db_struct_prd.db_name,
-#             table=db_struct_prd.table,
-#             mode="r",
-#         )
-#         data = sqldb.read_by_range(
-#             bgn_date=base_bgn_date, stp_date=stp_date,
-#             value_columns=["trade_date", "instrument", self.test.ret.ret_name],
-#         )
-#         return data
-#
-#     def core(self, input_data: pd.DataFrame, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
-#         sorted_data = input_data.sort_values(
-#             by=["trade_date", self.test.ret.ret_name, "instrument"], ascending=[True, False, True]
-#         )
-#         grouped_data = sorted_data.groupby(by=["trade_date"], group_keys=False)
-#         signal_data = grouped_data.apply(self.map_factor_to_signal)
-#         signal_data_ma = self.moving_average_signal(signal_data, bgn_date=bgn_date, maw=self.maw)
-#         return signal_data_ma
-#
-#
-# def process_for_signal_from_mdl_prd(
-#         test: CTestMdl, mclrn_prd_dir: str, signal_save_dir: str,
-#         bgn_date: str, stp_date: str, calendar: CCalendar,
-# ):
-#     signal = CSignalFromMdlPrd(test=test, mclrn_prd_dir=mclrn_prd_dir, signal_save_dir=signal_save_dir)
-#     signal.main(bgn_date, stp_date, calendar)
-#     return 0
-#
-#
-# def main_signals_from_mdl_prd(
-#         tests: list[CTestMdl],
-#         mclrn_prd_dir: str,
-#         signal_save_dir: str,
-#         bgn_date: str,
-#         stp_date: str,
-#         calendar: CCalendar,
-#         call_multiprocess: bool,
-#         processes: int,
-# ):
-#     desc = "Translating machine learning model predictions to signals"
-#     if call_multiprocess:
-#         with Progress() as pb:
-#             main_task = pb.add_task(description=desc, total=len(tests))
-#             with mp.get_context("spawn").Pool(processes) as pool:
-#                 for test in tests:
-#                     pool.apply_async(
-#                         process_for_signal_from_mdl_prd,
-#                         kwds={
-#                             "test": test,
-#                             "mclrn_prd_dir": mclrn_prd_dir,
-#                             "signal_save_dir": signal_save_dir,
-#                             "bgn_date": bgn_date,
-#                             "stp_date": stp_date,
-#                             "calendar": calendar,
-#                         },
-#                         callback=lambda _: pb.update(main_task, advance=1),
-#                         error_callback=error_handler,
-#                     )
-#                 pool.close()
-#                 pool.join()
-#     else:
-#         for test in track(tests, description=desc):
-#             process_for_signal_from_mdl_prd(
-#                 test=test,
-#                 mclrn_prd_dir=mclrn_prd_dir,
-#                 signal_save_dir=signal_save_dir,
-#                 bgn_date=bgn_date,
-#                 stp_date=stp_date,
-#                 calendar=calendar,
-#             )
-#     return 0
-#
-#
-# """
-# ---------------------------------------
-# --- signals from model optimization ---
-# ---------------------------------------
-# """
-#
-#
-# class CSignalFromOpt(_CSignal):
-#     def __init__(
-#             self, group_id: TSimGrpIdByFacGrp | TRetPrc, sim_args_list: list[CSimArgs],
-#             input_sig_dir: str,
-#             input_opt_dir: str,
-#             signal_save_dir: str
-#     ):
-#         if isinstance(group_id, tuple):
-#             signal_id = ".".join(group_id)
-#         elif isinstance(group_id, str):
-#             signal_id = group_id
-#         else:
-#             raise TypeError(f"type of {group_id} is {type(group_id)}, which is illegal")
-#         self.input_signal_ids: list[str] = [sim_args.sim_id for sim_args in sim_args_list]
-#         self.input_sig_dir = input_sig_dir
-#         self.input_opt_dir = input_opt_dir
-#         super().__init__(signal_save_dir=signal_save_dir, signal_id=signal_id)
-#
-#     @property
-#     def underlying_assets_names(self) -> list[str]:
-#         return [input_signal_id.split(".")[0] for input_signal_id in self.input_signal_ids]
-#
-#     def load_opt(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
-#         db_struct_opt = gen_opt_wgt_db(
-#             db_save_dir=self.input_opt_dir,
-#             save_id=self.signal_id,
-#             underlying_assets_names=self.underlying_assets_names,
-#         )
-#         sqldb = CMgrSqlDb(
-#             db_save_dir=db_struct_opt.db_save_dir,
-#             db_name=db_struct_opt.db_name,
-#             table=db_struct_opt.table,
-#             mode="a",
-#         )
-#         data = sqldb.read_by_range(bgn_date=bgn_date, stp_date=stp_date)
-#         return data.set_index("trade_date")
-#
-#     def load_input(self, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
-#         input_data = {}
-#         for input_signal_id in self.input_signal_ids:
-#             signal_id = ".".join(input_signal_id.split(".")[:-1])
-#             unique_id = input_signal_id.split(".")[0]
-#             db_struct_sig = gen_sig_db(db_save_dir=self.input_sig_dir, signal_id=signal_id)
-#             sqldb = CMgrSqlDb(
-#                 db_save_dir=db_struct_sig.db_save_dir,
-#                 db_name=db_struct_sig.db_name,
-#                 table=db_struct_sig.table,
-#                 mode="r",
-#             )
-#             data = sqldb.read_by_range(bgn_date=bgn_date, stp_date=stp_date)
-#             input_data[unique_id] = data.set_index(["trade_date", "instrument"])["weight"]
-#         return pd.DataFrame(input_data)
-#
-#     @staticmethod
-#     def apply_opt(sorted_data: pd.DataFrame, opt_data: pd.DataFrame) -> pd.DataFrame:
-#         res = []
-#         for trade_date, trade_date_data in sorted_data.groupby(by="trade_date"):
-#             srs = trade_date_data @ opt_data.loc[trade_date]
-#             if (abs_sum := srs.abs().sum()) > 0:
-#                 srs = srs / abs_sum
-#             res.append(srs)
-#         optimized_data = pd.concat(res).reset_index().rename(columns={0: "weight"})
-#         return optimized_data
-#
-#     def core(self, input_data: pd.DataFrame, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
-#         sorted_data = input_data.sort_values(by="trade_date", ascending=True).fillna(0)
-#         opt_data = self.load_opt(bgn_date, stp_date)
-#         signal_data = self.apply_opt(sorted_data, opt_data)
-#         return signal_data
-#
-#
-# def process_for_signal_from_opt(
-#         group_id: TSimGrpIdByFacGrp | TRetPrc,
-#         sim_args_list: list[CSimArgs],
-#         input_sig_dir: str,
-#         input_opt_dir: str,
-#         signal_save_dir: str,
-#         bgn_date: str, stp_date: str, calendar: CCalendar,
-# ):
-#     signal = CSignalFromOpt(
-#         group_id=group_id, sim_args_list=sim_args_list, input_sig_dir=input_sig_dir,
-#         input_opt_dir=input_opt_dir, signal_save_dir=signal_save_dir,
-#     )
-#     signal.main(bgn_date, stp_date, calendar)
-#     return 0
-#
-#
-# def main_signals_from_opt(
-#         grouped_sim_args: dict[TSimGrpIdByFacGrp | TRetPrc, list[CSimArgs]],
-#         input_sig_dir: str,
-#         input_opt_dir: str,
-#         signal_save_dir: str,
-#         bgn_date: str,
-#         stp_date: str,
-#         calendar: CCalendar,
-#         call_multiprocess: bool,
-#         processes: int,
-# ):
-#     desc = "Translating optimized models to signals"
-#     if call_multiprocess:
-#         with Progress() as pb:
-#             main_task = pb.add_task(description=desc, total=len(grouped_sim_args))
-#             with mp.get_context("spawn").Pool(processes) as pool:
-#                 for group_id, sim_args_list in grouped_sim_args.items():
-#                     pool.apply_async(
-#                         process_for_signal_from_opt,
-#                         kwds={
-#                             "group_id": group_id,
-#                             "sim_args_list": sim_args_list,
-#                             "input_sig_dir": input_sig_dir,
-#                             "input_opt_dir": input_opt_dir,
-#                             "signal_save_dir": signal_save_dir,
-#                             "bgn_date": bgn_date,
-#                             "stp_date": stp_date,
-#                             "calendar": calendar,
-#                         },
-#                         callback=lambda _: pb.update(main_task, advance=1),
-#                         error_callback=error_handler,
-#                     )
-#                 pool.close()
-#                 pool.join()
-#     else:
-#         for group_id, sim_args_list in track(grouped_sim_args.items(), description=desc):
-#             process_for_signal_from_opt(
-#                 group_id=group_id,
-#                 sim_args_list=sim_args_list,
-#                 input_sig_dir=input_sig_dir,
-#                 input_opt_dir=input_opt_dir,
-#                 signal_save_dir=signal_save_dir,
-#                 bgn_date=bgn_date,
-#                 stp_date=stp_date,
-#                 calendar=calendar,
-#             )
-#     return 0
+
+"""
+---------------------------------------
+--- signals from model optimization ---
+---------------------------------------
+"""
+
+
+class CSignalFromOpt(_CSignal):
+    def __init__(
+            self, group_id: TRetPrc, sim_args_list: list[CSimArgs],
+            input_sig_dir: str,
+            input_opt_dir: str,
+            signal_save_dir: str
+    ):
+        signal_id = group_id
+        self.input_signal_ids: list[str] = [sim_args.sim_id for sim_args in sim_args_list]
+        self.input_sig_dir = input_sig_dir
+        self.input_opt_dir = input_opt_dir
+        super().__init__(signal_save_dir=signal_save_dir, signal_id=signal_id)
+
+    @property
+    def underlying_assets_names(self) -> list[str]:
+        return [input_signal_id.split(".")[0] for input_signal_id in self.input_signal_ids]
+
+    def load_opt(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
+        db_struct_opt = gen_opt_wgt_db(
+            db_save_dir=self.input_opt_dir,
+            save_id=self.signal_id,
+            underlying_assets_names=self.underlying_assets_names,
+        )
+        sqldb = CMgrSqlDb(
+            db_save_dir=db_struct_opt.db_save_dir,
+            db_name=db_struct_opt.db_name,
+            table=db_struct_opt.table,
+            mode="r",
+        )
+        data = sqldb.read_by_range(bgn_date=bgn_date, stp_date=stp_date)
+        return data.set_index("trade_date")
+
+    def load_input(self, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        input_data = {}
+        for input_signal_id in self.input_signal_ids:
+            signal_id = ".".join(input_signal_id.split(".")[:-1])
+            unique_id = input_signal_id.split(".")[0]
+            db_struct_sig = gen_sig_db(db_save_dir=self.input_sig_dir, signal_id=signal_id)
+            sqldb = CMgrSqlDb(
+                db_save_dir=db_struct_sig.db_save_dir,
+                db_name=db_struct_sig.db_name,
+                table=db_struct_sig.table,
+                mode="r",
+            )
+            data = sqldb.read_by_range(bgn_date=bgn_date, stp_date=stp_date)
+            input_data[unique_id] = data.set_index(["trade_date", "instrument"])["weight"]
+        return pd.DataFrame(input_data)
+
+    @staticmethod
+    def apply_opt(sorted_data: pd.DataFrame, opt_data: pd.DataFrame) -> pd.DataFrame:
+        res = []
+        for trade_date, trade_date_data in sorted_data.groupby(by="trade_date"):
+            srs = trade_date_data @ opt_data.loc[trade_date]
+            if (abs_sum := srs.abs().sum()) > 0:
+                srs = srs / abs_sum
+            res.append(srs)
+        optimized_data = pd.concat(res).reset_index().rename(columns={0: "weight"})
+        return optimized_data
+
+    def core(self, input_data: pd.DataFrame, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        sorted_data = input_data.sort_values(by="trade_date", ascending=True).fillna(0)
+        opt_data = self.load_opt(bgn_date, stp_date)
+        signal_data = self.apply_opt(sorted_data, opt_data)
+        return signal_data
+
+
+def process_for_signal_from_opt(
+        group_id: TRetPrc,
+        sim_args_list: list[CSimArgs],
+        input_sig_dir: str,
+        input_opt_dir: str,
+        signal_save_dir: str,
+        bgn_date: str, stp_date: str, calendar: CCalendar,
+):
+    signal = CSignalFromOpt(
+        group_id=group_id, sim_args_list=sim_args_list, input_sig_dir=input_sig_dir,
+        input_opt_dir=input_opt_dir, signal_save_dir=signal_save_dir,
+    )
+    signal.main(bgn_date, stp_date, calendar)
+    return 0
+
+
+def main_signals_from_opt(
+        grouped_sim_args: dict[TRetPrc, list[CSimArgs]],
+        input_sig_dir: str,
+        input_opt_dir: str,
+        signal_save_dir: str,
+        bgn_date: str,
+        stp_date: str,
+        calendar: CCalendar,
+        call_multiprocess: bool,
+        processes: int,
+):
+    desc = "Translating optimized models to signals"
+    if call_multiprocess:
+        with Progress() as pb:
+            main_task = pb.add_task(description=desc, total=len(grouped_sim_args))
+            with mp.get_context("spawn").Pool(processes) as pool:
+                for group_id, sim_args_list in grouped_sim_args.items():
+                    pool.apply_async(
+                        process_for_signal_from_opt,
+                        kwds={
+                            "group_id": group_id,
+                            "sim_args_list": sim_args_list,
+                            "input_sig_dir": input_sig_dir,
+                            "input_opt_dir": input_opt_dir,
+                            "signal_save_dir": signal_save_dir,
+                            "bgn_date": bgn_date,
+                            "stp_date": stp_date,
+                            "calendar": calendar,
+                        },
+                        callback=lambda _: pb.update(main_task, advance=1),
+                        error_callback=error_handler,
+                    )
+                pool.close()
+                pool.join()
+    else:
+        for group_id, sim_args_list in track(grouped_sim_args.items(), description=desc):
+            process_for_signal_from_opt(
+                group_id=group_id,
+                sim_args_list=sim_args_list,
+                input_sig_dir=input_sig_dir,
+                input_opt_dir=input_opt_dir,
+                signal_save_dir=signal_save_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+            )
+    return 0
