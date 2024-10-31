@@ -7,7 +7,7 @@ from husfort.qevaluation import CNAV
 from husfort.qsqlite import CMgrSqlDb, CDbStruct
 from husfort.qplot import CPlotLines
 from solutions.shared import gen_nav_db
-from typedef import CSimArgs, TSimGrpIdByFacAgg, TSimGrpIdByFacGrp, TRetPrc
+from typedef import CSimArgs, TSimGrpIdByFacAgg, TRetPrc
 
 
 class CEvl:
@@ -71,43 +71,7 @@ class CEvlFacAgg(CEvlFrmSim):
         return 0
 
 
-class CEvlMdlPrd(CEvlFrmSim):
-    """
-    --- evaluations for machine learning models ---
-    """
-
-    def add_arguments(self, res: dict):
-        unique_id, prd_ret, factor_group, trn_win, model, maw, tgt_ret = self.sim_args.sim_id.split(".")
-        other_arguments = {
-            "unique_id": unique_id,
-            "prd_ret": prd_ret,
-            "factor_group": factor_group,
-            "trn_win": trn_win,
-            "model": model,
-            "maw": maw,
-            "tgt_ret": tgt_ret,
-        }
-        res.update(other_arguments)
-        return 0
-
-
-class CEvlMdlOpt(CEvlFrmSim):
-    """
-    --- evaluations for factor group ---
-    """
-
-    def add_arguments(self, res: dict):
-        factor_group, ret_prc, tgt_ret = self.sim_args.sim_id.split(".")
-        other_arguments = {
-            "factor_group": factor_group,
-            "ret_prc": ret_prc,
-            "tgt_ret": tgt_ret,
-        }
-        res.update(other_arguments)
-        return 0
-
-
-class CEvlGrpOpt(CEvlFrmSim):
+class CEvlFacOpt(CEvlFrmSim):
     """
     --- evaluations for price type ---
     """
@@ -131,12 +95,8 @@ def process_for_evl_frm_sim(
 ) -> dict:
     if sim_type == "facAgg":
         s = CEvlFacAgg(sim_args, sim_save_dir=sim_save_dir)
-    elif sim_type == "mdlPrd":
-        s = CEvlMdlPrd(sim_args, sim_save_dir=sim_save_dir)
-    elif sim_type == "mdlOpt":
-        s = CEvlMdlOpt(sim_args, sim_save_dir=sim_save_dir)
-    elif sim_type == "grpOpt":
-        s = CEvlGrpOpt(sim_args, sim_save_dir=sim_save_dir)
+    elif sim_type == "facOpt":
+        s = CEvlFacOpt(sim_args, sim_save_dir=sim_save_dir)
     else:
         raise ValueError(f"sim type = {sim_type} is illegal")
     return s.main(bgn_date, stp_date)
@@ -228,7 +188,7 @@ def plot_sim_args_list(
 
 
 def main_plt_grouped_sim_args(
-        grouped_sim_args: dict[TSimGrpIdByFacAgg | TSimGrpIdByFacGrp | TRetPrc, list[CSimArgs]],
+        grouped_sim_args: dict[TSimGrpIdByFacAgg | TRetPrc, list[CSimArgs]],
         sim_save_dir: str,
         plt_save_dir: str,
         bgn_date: str,
