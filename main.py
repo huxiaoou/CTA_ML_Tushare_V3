@@ -476,6 +476,24 @@ if __name__ == "__main__":
                 call_multiprocess=not args.nomp,
                 processes=args.processes,
             )
+        elif args.type == "facOpt":
+            from solutions.shared import get_sim_args_fac_opt
+
+            sim_args_list = get_sim_args_fac_opt(
+                rets=proj_cfg.get_test_rets(),
+                signals_dir=proj_cfg.sig_frm_fac_opt_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST,
+            )
+            main_simulations(
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_fac_opt_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
         else:
             raise ValueError(f"args.type == {args.type} is illegal")
     elif args.switch == "evaluations":
