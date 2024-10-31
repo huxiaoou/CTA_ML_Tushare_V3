@@ -197,7 +197,7 @@ def gen_opt_wgt_db(db_save_dir: str, save_id: str, underlying_assets_names: list
 # -----------------------------------------
 
 def get_sim_args_fac(
-        factors: TFactors, maws: list[int], rets: TRets, signals_dir: str, ret_dir: str, cost:float,
+        factors: TFactors, maws: list[int], rets: TRets, signals_dir: str, ret_dir: str, cost: float,
 ) -> list[CSimArgs]:
     res: list[CSimArgs] = []
     for factor, maw, ret in ittl.product(factors, maws, rets):
