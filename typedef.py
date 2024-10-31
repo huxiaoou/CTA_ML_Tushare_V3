@@ -803,7 +803,7 @@ class CCfgProj:
 
     @property
     def test_rets_wins(self) -> list[int]:
-        return self.prd.wins + self.sim.wins
+        return self.sim.wins + self.prd.wins
 
     def get_test_rets(self) -> TRets:
         res: TRets = []

@@ -48,7 +48,7 @@ class CTstRetRaw(_CTstRet):
 
     @property
     def save_id(self) -> str:
-        return f"{self.win:03d}L{self.lag}RAW"
+        return f"{self.win:03d}L{self.lag}"
 
     def load_preprocess(self, instru: str, bgn_date: str, stp_date: str) -> pd.DataFrame:
         sqldb = CMgrSqlDb(
@@ -77,7 +77,6 @@ class CTstRetRaw(_CTstRet):
         iter_dates = calendar.get_iter_list(bgn_date, stp_date)
         base_bgn_date = self.get_base_date(iter_dates[0], calendar)
         base_end_date = self.get_base_date(iter_dates[-1], calendar)
-
         db_struct_instru = gen_tst_ret_raw_db(
             instru=instru,
             db_save_root_dir=self.db_tst_ret_save_dir,
@@ -117,23 +116,23 @@ class CTstRetAgg(_CTstRet):
 
     @property
     def save_id(self) -> str:
-        return f"{self.win:03d}L{self.lag}NEU"
+        return f"{self.win:03d}L{self.lag}"
 
     @property
     def ref_id(self) -> str:
-        return self.save_id.replace("NEU", "RAW")
+        return self.save_id
 
     @property
     def ref_rets(self) -> list[str]:
-        return [z.replace("NEU", "RAW") for z in self.rets]
+        return self.rets
 
     @property
     def ref_lbl_cls(self) -> str:
-        return self.ret_lbl_cls.replace("NEU", "RAW")
+        return self.ret_lbl_cls
 
     @property
     def ref_lbl_opn(self) -> str:
-        return self.ret_lbl_opn.replace("NEU", "RAW")
+        return self.ret_lbl_opn
 
     def load_ref_ret_by_instru(self, instru: str, bgn_date: str, stp_date: str) -> pd.DataFrame:
         db_struct_ref = gen_tst_ret_raw_db(
@@ -187,31 +186,25 @@ class CTstRetAgg(_CTstRet):
             mode="a",
         )
         if sqldb.check_continuity(new_data["trade_date"].iloc[0], calendar) == 0:
-            instru_tst_ret_neu_data = new_data[db_struct_instru.table.vars.names]
-            sqldb.update(update_data=instru_tst_ret_neu_data)
+            instru_tst_ret_agg_data = new_data[db_struct_instru.table.vars.names]
+            sqldb.update(update_data=instru_tst_ret_agg_data)
         return 0
 
     def main_test_return_neu(self, bgn_date: str, stp_date: str, calendar: CCalendar):
-        logger.info(f"Neutralizing test return with lag = {SFG(self.lag)}, win = {SFG(self.win)}")
+        logger.info(f"Aggregating test return with lag = {SFG(self.lag)}, win = {SFG(self.win)}")
         iter_dates = calendar.get_iter_list(bgn_date, stp_date)
         base_bgn_date = self.get_base_date(iter_dates[0], calendar)
         base_end_date = self.get_base_date(iter_dates[-1], calendar)
         base_stp_date = calendar.get_next_date(base_end_date, shift=1)
 
         ref_tst_ret_data = self.load_ref_ret(base_bgn_date, base_stp_date)
-        self.save(ref_tst_ret_data, calendar, data_type="raw")
-
         available_data = self.load_available(base_bgn_date, base_stp_date)
-        net_ref_tst_ret_data = pd.merge(
+        tst_ret_avlb_data = pd.merge(
             left=available_data,
             right=ref_tst_ret_data,
             on=["trade_date", "instrument"],
             how="left",
         ).sort_values(by=["trade_date", "sectorL1"])
-        tst_ret_neu_data = neutralize_by_date(
-            net_ref_tst_ret_data, old_names=self.ref_rets, new_names=self.rets,
-            date_name="trade_date", sec_name="sectorL1", instru_name="instrument",
-        )
-        tst_ret_neu_data = tst_ret_neu_data.query(f"trade_date >= '{base_bgn_date}' & trade_date <= '{base_stp_date}'")
-        self.save(tst_ret_neu_data, calendar, data_type="neu")
+        tst_ret_agg_data = tst_ret_avlb_data.query(f"trade_date >= '{base_bgn_date}' & trade_date <= '{base_stp_date}'")
+        self.save(tst_ret_agg_data, calendar)
         return 0

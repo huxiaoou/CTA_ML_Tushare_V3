@@ -92,31 +92,31 @@ if __name__ == "__main__":
             mkt_idxes=list(proj_cfg.mkt_idxes.values()),
             sectors=proj_cfg.const.SECTORS,
         )
-    # elif args.switch == "test_return":
-    #     from solutions.test_return import CTstRetRaw, CTstRetAgg
-    #
-    #     for win in proj_cfg.test_rets_wins:
-    #         # --- raw return
-    #         tst_ret = CTstRetRaw(
-    #             win=win, lag=proj_cfg.const.LAG,
-    #             universe=proj_cfg.universe,
-    #             db_tst_ret_save_dir=proj_cfg.test_return_dir,
-    #             db_struct_preprocess=db_struct_cfg.preprocess,
-    #         )
-    #         tst_ret.main_test_return_raw(bgn_date, stp_date, calendar)
-    #
-    #         # --- neutralization
-    #         tst_ret_neu = CTstRetAgg(
-    #             win=win, lag=proj_cfg.const.LAG,
-    #             universe=proj_cfg.universe,
-    #             db_tst_ret_save_dir=proj_cfg.test_return_dir,
-    #             db_struct_avlb=db_struct_cfg.available,
-    #         )
-    #         tst_ret_neu.main_test_return_neu(
-    #             bgn_date=bgn_date,
-    #             stp_date=stp_date,
-    #             calendar=calendar,
-    #         )
+    elif args.switch == "test_return":
+        from solutions.test_return import CTstRetRaw, CTstRetAgg
+
+        for win in proj_cfg.test_rets_wins:
+            # --- raw return
+            tst_ret_raw = CTstRetRaw(
+                win=win, lag=proj_cfg.const.LAG,
+                universe=proj_cfg.universe,
+                db_tst_ret_save_dir=proj_cfg.test_return_dir,
+                db_struct_preprocess=db_struct_cfg.preprocess,
+            )
+            tst_ret_raw.main_test_return_raw(bgn_date, stp_date, calendar)
+
+            # --- aggregate
+            tst_ret_agg = CTstRetAgg(
+                win=win, lag=proj_cfg.const.LAG,
+                universe=proj_cfg.universe,
+                db_tst_ret_save_dir=proj_cfg.test_return_dir,
+                db_struct_avlb=db_struct_cfg.available,
+            )
+            tst_ret_agg.main_test_return_neu(
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+            )
     # elif args.switch == "factor":
     #     from project_config import cfg_factors
     #
