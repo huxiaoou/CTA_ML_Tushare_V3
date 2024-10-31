@@ -6,7 +6,7 @@ from husfort.qutility import SFY, error_handler, check_and_makedirs
 from husfort.qsqlite import CDbStruct, CMgrSqlDb
 from husfort.qcalendar import CCalendar
 from typedef import TFactorClass, TFactorNames, TUniverse, TFactorName
-from solutions.shared import gen_fac_raw_db, gen_fac_neu_db, neutralize_by_date
+from solutions.shared import gen_fac_raw_db, gen_fac_agg_db, neutralize_by_date
 
 
 class CFactorGeneric:
@@ -40,8 +40,8 @@ class CFactorGeneric:
             sqldb.update(factor_data[db_struct_instru.table.vars.names])
         return 0
 
-    def save_neu_by_class(self, factor_data: pd.DataFrame, calendar: CCalendar):
-        db_struct_class = gen_fac_neu_db(self.save_by_instru_dir, self.factor_class, self.factor_names)
+    def save_agg_by_class(self, factor_data: pd.DataFrame, calendar: CCalendar):
+        db_struct_class = gen_fac_agg_db(self.save_by_instru_dir, self.factor_class, self.factor_names)
         check_and_makedirs(db_struct_class.db_save_dir)
         sqldb = CMgrSqlDb(
             db_save_dir=db_struct_class.db_save_dir,
@@ -196,18 +196,18 @@ class CFactorRaw(CFactorGeneric):
         return 0
 
 
-# --------------------------------------------
-# -------------- Neutralization --------------
-# --------------------------------------------
+# ---------------------------------------
+# -------------- Aggregate --------------
+# ---------------------------------------
 
-class CFactorNeu(CFactorGeneric):
+class CFactorAgg(CFactorGeneric):
     def __init__(
             self,
             ref_factor: CFactorGeneric,
             universe: TUniverse,
             db_struct_preprocess: CDbStruct,
             db_struct_avlb: CDbStruct,
-            neutral_by_instru_dir: str,
+            factors_aggr_avlb_dir: str,
     ):
         self.ref_factor: CFactorGeneric = ref_factor
         self.universe = universe
@@ -215,8 +215,8 @@ class CFactorNeu(CFactorGeneric):
         self.db_struct_avlb = db_struct_avlb
         super().__init__(
             factor_class=self.ref_factor.factor_class,
-            factor_names=TFactorNames([TFactorName(z.replace("RAW", "NEU")) for z in self.ref_factor.factor_names]),
-            save_by_instru_dir=neutral_by_instru_dir,
+            factor_names=self.ref_factor.factor_names,
+            save_by_instru_dir=factors_aggr_avlb_dir,
         )
 
     def load_ref_factor(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
@@ -241,7 +241,7 @@ class CFactorNeu(CFactorGeneric):
         df = df[["trade_date", "instrument", "sectorL1"]]
         return df
 
-    def main_neu(self, bgn_date: str, stp_date: str, calendar: CCalendar):
+    def main_agg(self, bgn_date: str, stp_date: str, calendar: CCalendar):
         ref_factor_data = self.load_ref_factor(bgn_date, stp_date)
         available_data = self.load_available(bgn_date, stp_date)
         net_ref_factor_data = pd.merge(
@@ -250,10 +250,6 @@ class CFactorNeu(CFactorGeneric):
             on=["trade_date", "instrument"],
             how="left",
         ).sort_values(by=["trade_date", "sectorL1"])
-        neu_factor_data = neutralize_by_date(
-            net_ref_factor_data, old_names=self.ref_factor.factor_names, new_names=self.factor_names,
-            date_name="trade_date", sec_name="sectorL1", instru_name="instrument",
-        )
-        neu_factor_data[self.factor_names] = neu_factor_data[self.factor_names].fillna(0)
-        self.save_neu_by_class(factor_data=neu_factor_data, calendar=calendar)
+        agg_factor_data = net_ref_factor_data
+        self.save_agg_by_class(factor_data=agg_factor_data, calendar=calendar)
         return 0

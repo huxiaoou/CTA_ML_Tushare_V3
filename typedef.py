@@ -432,8 +432,8 @@ class CCfgFactorEXR(CCfgFactor):
     @property
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
-        n1 = [TFactorName(f"DXR{w:03d}D{d:02d}_RAW") for w, d in ittl.product(self.wins, self.dfts)]
-        n2 = [TFactorName(f"AXR{w:03d}D{d:02d}_RAW") for w, d in ittl.product(self.wins, self.dfts)]
+        n1 = [TFactorName(f"DXR{w:03d}D{d:02d}") for w, d in ittl.product(self.wins, self.dfts)]
+        n2 = [TFactorName(f"AXR{w:03d}D{d:02d}") for w, d in ittl.product(self.wins, self.dfts)]
         return TFactorNames(n0 + n1 + n2)
 
 
@@ -447,8 +447,8 @@ class CCfgFactorSMT(CCfgFactor):
 
     @property
     def factor_names(self) -> TFactorNames:
-        n_prc = [TFactorName(f"{self.factor_class}T{int(lbd * 10):02d}P_RAW") for lbd in self.lbds]
-        n_ret = [TFactorName(f"{self.factor_class}T{int(lbd * 10):02d}R_RAW") for lbd in self.lbds]
+        n_prc = [TFactorName(f"{self.factor_class}T{int(lbd * 10):02d}P") for lbd in self.lbds]
+        n_ret = [TFactorName(f"{self.factor_class}T{int(lbd * 10):02d}R") for lbd in self.lbds]
         return TFactorNames(n_prc + n_ret)
 
 
@@ -462,10 +462,10 @@ class CCfgFactorRWTC(CCfgFactor):
 
     @property
     def factor_names(self) -> TFactorNames:
-        nu = [TFactorName(f"{self.factor_class}{w:03d}U_RAW") for w in self.wins]
-        nd = [TFactorName(f"{self.factor_class}{w:03d}D_RAW") for w in self.wins]
-        # nt = [TFactorName(f"{self.factor_class}{w:03d}T_RAW") for w in self.wins]
-        nv = [TFactorName(f"{self.factor_class}{w:03d}V_RAW") for w in self.wins]
+        nu = [TFactorName(f"{self.factor_class}{w:03d}U") for w in self.wins]
+        nd = [TFactorName(f"{self.factor_class}{w:03d}D") for w in self.wins]
+        # nt = [TFactorName(f"{self.factor_class}{w:03d}T") for w in self.wins]
+        nv = [TFactorName(f"{self.factor_class}{w:03d}V") for w in self.wins]
         return TFactorNames(nu + nd + nv)
 
 
@@ -492,66 +492,66 @@ class CCfgFactorTA(CCfgFactor):
     @property
     def name_macd(self) -> TFactorName:
         fast, slow, diff = self.macd
-        return TFactorName(f"{self.factor_class}MACDF{fast}S{slow}D{diff}_RAW")
+        return TFactorName(f"{self.factor_class}MACDF{fast}S{slow}D{diff}")
 
     @property
     def name_bbands(self) -> TFactorName:
         timeperiod, up, dn = self.bbands
-        return TFactorName(f"{self.factor_class}BBANDT{timeperiod}U{up}D{dn}_RAW")
+        return TFactorName(f"{self.factor_class}BBANDT{timeperiod}U{up}D{dn}")
 
     @property
     def name_sar(self) -> TFactorName:
         acceleration, maximum = self.sar
-        return TFactorName(f"{self.factor_class}SARA{int(acceleration * 100):02d}M{int(maximum * 100):02d}_RAW")
+        return TFactorName(f"{self.factor_class}SARA{int(acceleration * 100):02d}M{int(maximum * 100):02d}")
 
     @property
     def name_adx(self) -> TFactorName:
         timeperiod = self.adx
-        return TFactorName(f"{self.factor_class}ADXT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}ADXT{timeperiod}")
 
     @property
     def name_bop(self) -> TFactorName:
-        return TFactorName(f"{self.factor_class}BOP_RAW")
+        return TFactorName(f"{self.factor_class}BOP")
 
     @property
     def name_cci(self) -> TFactorName:
         timeperiod = self.cci
-        return TFactorName(f"{self.factor_class}CCIT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}CCIT{timeperiod}")
 
     @property
     def name_cmo(self) -> TFactorName:
         timeperiod = self.cmo
-        return TFactorName(f"{self.factor_class}CMOT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}CMOT{timeperiod}")
 
     @property
     def name_rsi(self) -> TFactorName:
         timeperiod = self.rsi
-        return TFactorName(f"{self.factor_class}RSIT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}RSIT{timeperiod}")
 
     @property
     def name_mfi(self) -> TFactorName:
         timeperiod = self.mfi
-        return TFactorName(f"{self.factor_class}MFIT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}MFIT{timeperiod}")
 
     @property
     def name_willr(self) -> TFactorName:
         timeperiod = self.willr
-        return TFactorName(f"{self.factor_class}WILLRT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}WILLRT{timeperiod}")
 
     @property
     def name_adosc(self) -> TFactorName:
         fast, slow = self.adosc
-        return TFactorName(f"{self.factor_class}ADOSCF{fast}S{slow}_RAW")
+        return TFactorName(f"{self.factor_class}ADOSCF{fast}S{slow}")
 
     @property
     def name_obv(self) -> TFactorName:
         timeperiod = self.obv
-        return TFactorName(f"{self.factor_class}OBVT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}OBVT{timeperiod}")
 
     @property
     def name_natr(self) -> TFactorName:
         timeperiod = self.natr
-        return TFactorName(f"{self.factor_class}NATRT{timeperiod}_RAW")
+        return TFactorName(f"{self.factor_class}NATRT{timeperiod}")
 
     @property
     def factor_names(self) -> TFactorNames:

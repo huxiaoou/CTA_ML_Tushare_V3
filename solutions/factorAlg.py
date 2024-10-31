@@ -125,8 +125,8 @@ class CFactorRS(CFactorRaw):
         )
         adj_data["stock"] = adj_data["stock"].ffill(limit=__min_win).fillna(0)
         for win in self.cfg.wins:
-            rspa = f"{self.factor_class}PA{win:03d}_RAW"
-            rsla = f"{self.factor_class}LA{win:03d}_RAW"
+            rspa = f"{self.factor_class}PA{win:03d}"
+            rsla = f"{self.factor_class}LA{win:03d}"
 
             ma = adj_data["stock"].rolling(window=win).mean()
             s = adj_data["stock"] / ma
@@ -156,8 +156,8 @@ class CFactorBASIS(CFactorRaw):
             values=["trade_date", "ticker_major", "basis_rate"],
         )
         for win in self.cfg.wins:
-            f0 = f"{self.factor_class}{win:03d}_RAW"
-            f1 = f"{self.factor_class}D{win:03d}_RAW"
+            f0 = f"{self.factor_class}{win:03d}"
+            f1 = f"{self.factor_class}D{win:03d}"
             adj_data[f0] = adj_data["basis_rate"].rolling(window=win, min_periods=int(2 * win / 3)).mean()
             adj_data[f1] = adj_data["basis_rate"] - adj_data[f0]
         self.rename_ticker(adj_data)
@@ -198,8 +198,8 @@ class CFactorTS(CFactorRaw):
             axis=1,
         )
         for win in self.cfg.wins:
-            f0 = f"{self.factor_class}{win:03d}_RAW"
-            f1 = f"{self.factor_class}D{win:03d}_RAW"
+            f0 = f"{self.factor_class}{win:03d}"
+            f1 = f"{self.factor_class}D{win:03d}"
             adj_data[f0] = adj_data["ts"].rolling(window=win, min_periods=int(2 * win / 3)).mean()
             adj_data[f1] = adj_data["ts"] - adj_data[f0]
         self.rename_ticker(adj_data)
@@ -215,24 +215,24 @@ class __CFactorBETA(CFactorRaw):
 
     def betas_from_wins(self, wins: list[int], input_data: pd.DataFrame, x: str, y: str):
         __prefix0 = f"{self.factor_class}{wins[0]:03d}"
-        f0 = f"{__prefix0}_RAW"
+        f0 = f"{__prefix0}"
         for i, win in enumerate(wins):
-            fi = f"{self.factor_class}{win:03d}_RAW"
+            fi = f"{self.factor_class}{win:03d}"
             input_data[fi] = cal_rolling_beta(df=input_data, x=x, y=y, rolling_window=win)
             if i > 0:
-                fid = f"{__prefix0}D{win:03d}_RAW"
+                fid = f"{__prefix0}D{win:03d}"
                 input_data[fid] = input_data[f0] - input_data[fi]
         return 0
 
     def res_from_wins(self, wins: list[int], input_data: pd.DataFrame, x: str, y: str):
         for i, win in enumerate(wins):
-            b, fi = f"{self.factor_class}{win:03d}_RAW", f"{self.factor_class}{win:03d}RES_RAW"
+            b, fi = f"{self.factor_class}{win:03d}", f"{self.factor_class}{win:03d}RES"
             input_data[fi] = input_data[y] - input_data[x] * input_data[b]
         return 0
 
     def res_std_from_wins(self, wins: list[int], input_data: pd.DataFrame):
         for i, win in enumerate(wins):
-            res, fi = f"{self.factor_class}{win:03d}RES_RAW", f"{self.factor_class}{win:03d}RESSTD_RAW"
+            res, fi = f"{self.factor_class}{win:03d}RES", f"{self.factor_class}{win:03d}RESSTD"
             input_data[fi] = input_data[res].rolling(window=win, min_periods=int(win * 0.6)).std()
         return 0
 
@@ -385,7 +385,7 @@ class __CFactorCXY(CFactorRaw):
             sort_var: str,
     ):
         for win, top in ittl.product(wins, tops):
-            factor_name = f"{self.factor_class}{win:03d}T{int(top * 10):02d}_RAW"
+            factor_name = f"{self.factor_class}{win:03d}T{int(top * 10):02d}"
             top_size = int(win * top) + 1
             r_data = {}
             for i, trade_date in enumerate(raw_data.index):
@@ -668,7 +668,7 @@ class __CFactorMbrPos(CFactorRaw):
             net_data = self.cal_core(pos_data=pos_data, top=top, instru_oi_data=adj_data[["trade_date", "oi_instru"]])
             for win in self.cfg.wins:
                 mp = int(2 * win / 3)
-                factor_name = f"{self.factor_class}{win:03d}T{top:02d}_RAW"
+                factor_name = f"{self.factor_class}{win:03d}T{top:02d}"
                 res[factor_name] = net_data["net"].rolling(window=win, min_periods=mp).mean()
         res_df = pd.DataFrame(res).reset_index()
 
@@ -729,7 +729,7 @@ class CFactorAMP(CFactorRaw):
         for win, lbd in ittl.product(self.cfg.wins, self.cfg.lbds):
             top_size = int(win * lbd) + 1
             factor_h, factor_l, factor_d = [
-                f"{self.factor_class}{win:03d}T{int(lbd * 10):02d}{_}_RAW" for _ in ["H", "L", "D"]
+                f"{self.factor_class}{win:03d}T{int(lbd * 10):02d}{_}" for _ in ["H", "L", "D"]
             ]
             r_h_data, r_l_data, r_d_data = {}, {}, {}
             for i, trade_date in enumerate(adj_major_data["trade_date"]):
@@ -769,11 +769,11 @@ class CFactorEXR(CFactorRaw):
             idx_exr, exr = tday_minb_data[ret].argmax(), -ret_max
         else:
             idx_exr, exr = tday_minb_data[ret].argmin(), -ret_min
-        res = {"EXR_RAW": exr}
+        res = {"EXR": exr}
         for d in dfts:
             idx_dxr = idx_exr - d
             dxr = -tday_minb_data[ret].iloc[idx_dxr] if idx_dxr >= 0 else exr
-            res[f"DXR{d:02d}_RAW"] = dxr
+            res[f"DXR{d:02d}"] = dxr
         return pd.Series(res)
 
     def cal_factor_by_instru(
@@ -793,15 +793,15 @@ class CFactorEXR(CFactorRaw):
         factor_win_dfs: list[pd.DataFrame] = []
         for win in self.cfg.wins:
             rename_mapper = {
-                **{"EXR_RAW": f"EXR{win:03d}_RAW"},
-                **{f"DXR{d:02d}_RAW": f"DXR{win:03d}D{d:02d}_RAW" for d in self.cfg.dfts},
+                **{"EXR": f"EXR{win:03d}"},
+                **{f"DXR{d:02d}": f"DXR{win:03d}D{d:02d}" for d in self.cfg.dfts},
             }
             factor_win_data = exr_dxr_df.rolling(window=win).mean()
             factor_win_data = factor_win_data.rename(mapper=rename_mapper, axis=1)
             for d in self.cfg.dfts:
-                exr = f"EXR{win:03d}_RAW"
-                dxr = f"DXR{win:03d}D{d:02d}_RAW"
-                axr = f"AXR{win:03d}D{d:02d}_RAW"
+                exr = f"EXR{win:03d}"
+                dxr = f"DXR{win:03d}D{d:02d}"
+                axr = f"AXR{win:03d}D{d:02d}"
                 factor_win_data[axr] = (factor_win_data[exr] + factor_win_data[dxr] * np.sqrt(2)) * 0.5
             factor_win_dfs.append(factor_win_data)
         concat_factor_data = pd.concat(factor_win_dfs, axis=1, ignore_index=False)
@@ -855,8 +855,8 @@ class CFactorSMT(CFactorRaw):
     def cal_by_trade_date(self, trade_date_data: pd.DataFrame) -> pd.Series:
         res = {}
         for lbd in self.cfg.lbds:
-            p_lbl = f"{self.factor_class}T{int(lbd * 10):02d}P_RAW"
-            r_lbl = f"{self.factor_class}T{int(lbd * 10):02d}R_RAW"
+            p_lbl = f"{self.factor_class}T{int(lbd * 10):02d}P"
+            r_lbl = f"{self.factor_class}T{int(lbd * 10):02d}R"
             smt_p, smt_r = self.cal_smt(trade_date_data, lbd=lbd, prc="vwap", ret="freq_ret")
             res[p_lbl], res[r_lbl] = smt_p, smt_r
         return pd.Series(res)
@@ -930,10 +930,10 @@ class CFactorRWTC(CFactorRaw):
         factor_win_dfs: list[pd.DataFrame] = []
         for win in self.cfg.wins:
             rename_mapper = {
-                "RWTCU": f"{self.factor_class}{win:03d}U_RAW",
-                "RWTCD": f"{self.factor_class}{win:03d}D_RAW",
-                "RWTCT": f"{self.factor_class}{win:03d}T_RAW",
-                "RWTCV": f"{self.factor_class}{win:03d}V_RAW",
+                "RWTCU": f"{self.factor_class}{win:03d}U",
+                "RWTCD": f"{self.factor_class}{win:03d}D",
+                "RWTCT": f"{self.factor_class}{win:03d}T",
+                "RWTCV": f"{self.factor_class}{win:03d}V",
             }
             factor_win_data = rwtc_df.rolling(window=win).mean()
             factor_win_data = factor_win_data.rename(mapper=rename_mapper, axis=1)
