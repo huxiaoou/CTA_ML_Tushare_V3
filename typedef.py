@@ -154,9 +154,9 @@ class CCfgFactorTS(CCfgFactor):
 
     @property
     def factor_names(self) -> TFactorNames:
-        # n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
         n1 = [TFactorName(f"{self.factor_class}D{w:03d}") for w in self.wins]
-        return TFactorNames(n1)
+        return TFactorNames(n0 + n1)
 
 
 @dataclass(frozen=True)
