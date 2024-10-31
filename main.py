@@ -54,6 +54,10 @@ def parse_args():
     arg_parser_sub = arg_parser_subs.add_parser(name="evaluations", help="evaluate simulations")
     arg_parser_sub.add_argument("--type", type=str, choices=("facAgg",))
 
+    # switch: optimize
+    arg_parser_sub = arg_parser_subs.add_parser(name="optimize", help="optimize portfolio and signals")
+    arg_parser_sub.add_argument("--type", type=str, choices=("slcFac",))
+
     return arg_parser.parse_args()
 
 
@@ -486,6 +490,29 @@ if __name__ == "__main__":
                 plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_agg_dir, "plot-nav"),
                 bgn_date=bgn_date,
                 stp_date=stp_date,
+            )
+        else:
+            raise ValueError(f"args.type == {args.type} is illegal")
+    elif args.switch == "optimize":
+        from solutions.optimize import main_optimize
+
+        if args.type == "slcFac":
+            from solutions.shared import group_sim_args_from_slc_fac
+
+            grouped_sim_args = group_sim_args_from_slc_fac(
+                factor_names=proj_cfg.selected_factors_pool,
+                rets=proj_cfg.get_test_rets(),
+                signals_dir=proj_cfg.sig_frm_fac_agg_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_optimize(
+                grouped_sim_args=grouped_sim_args,
+                sim_save_dir=proj_cfg.sim_frm_fac_agg_dir,
+                lbd=proj_cfg.optimize["lbd"],
+                win=proj_cfg.optimize["win"],
+                save_dir=proj_cfg.opt_frm_slc_fac_dir,
+                bgn_date=bgn_date, stp_date=stp_date, calendar=calendar,
             )
         else:
             raise ValueError(f"args.type == {args.type} is illegal")

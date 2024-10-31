@@ -20,6 +20,7 @@ path:
   sig_frm_fac_agg_dir: sig_frm_fac_agg
   sim_frm_fac_agg_dir: sim_frm_fac_agg
   evl_frm_fac_agg_dir: evl_frm_fac_agg
+  opt_frm_slc_fac_dir: opt_frm_slc_fac
 
 
 mkt_idxes:
@@ -237,7 +238,7 @@ factors:
   MTM:
     wins: [ 120, 240 ]
   SKEW:
-    wins: [ 120, 240 ]
+    wins: [ 20, 60, 120, 240 ]
   RS:
     wins: [ 60, 120, 240 ]
   BASIS:
@@ -309,26 +310,33 @@ factors:
     obv: 10
     natr: 10
 
-factor_groups:
-  MTM: [ MTM ]
-  SKEW: [ SKEW ]
-  STOCK: [ RS ]
-  BASIS: [ BASIS ]
-  TS: [ TS ]
-  BETA: [ S0BETA, S1BETA, CBETA, IBETA, PBETA ]
-  TURNOVER: [ CTP, CSP ]
-  POSITION: [ NOI, NDOI ]
-  HFT: [ AMP, EXR, SMT, RWTC ]
-  TA: [ TA ]
-
-  #  G0: [
-  #    MTM, SKEW, RS, BASIS, TS,
-  #    S0BETA, S1BETA, CBETA, IBETA, PBETA,
-  #    CTP, CVP, CSP,
-  #    NOI, NDOI,
-  #    AMP, EXR, SMT, RWTC,
-  #    TA
-  #  ]
+selected_factors_pool: [
+  AMP060T06L,
+  AMP060T09D,
+  BASIS060,
+  CBETA020,
+  CSP060T05,
+  CTP060T05,
+  CVP120T05,
+  IBETA063,
+  MTM240,
+  NDOI060T05,
+  NOI060T05,
+  PBETA252,
+  RSPA240,
+  RSLA240,
+  RWTC010D,
+  RWTC010U,
+  RWTC010V,
+  S0BETA020,
+  S0BETA240,
+  S1BETA020,
+  S1BETA240,
+  SKEW240,
+  SMTT06R,
+  TAMFIT10,
+  TAWILLRT10,
+]
 
 # ------- models -------
 cv: 5

@@ -4,9 +4,8 @@ import scipy.stats as sps
 import itertools as ittl
 from rich.progress import Progress
 from husfort.qsqlite import CDbStruct, CSqlTable, CSqlVar
-from typedef import TFactorClass, TFactorName, TFactorNames, TFactors, CSimArgs, TRets, TUniqueId, TGroupId, TRetPrc
-from typedef import TSimGrpIdByFacAgg, TSimGrpIdByFacGrp
-from typedef import CTestMdl, CRet, CModel, TFactorGroups
+from typedef import TFactorClass, TFactorName, TFactorNames, TFactors, CSimArgs, TRets, TRetPrc
+from typedef import TSimGrpIdByFacAgg
 
 
 # ---------------------------------------
@@ -168,18 +167,6 @@ def gen_nav_db(db_save_dir: str, save_id: str) -> CDbStruct:
     )
 
 
-def gen_prdct_db(db_save_root_dir: str, test: CTestMdl) -> CDbStruct:
-    return CDbStruct(
-        db_save_dir=db_save_root_dir,
-        db_name=f"{test.save_tag_mdl}.db",
-        table=CSqlTable(
-            name="prediction",
-            primary_keys=[CSqlVar("trade_date", "TEXT"), CSqlVar("instrument", "TEXT")],
-            value_columns=[CSqlVar(test.ret.ret_name, "REAL")],
-        )
-    )
-
-
 def gen_opt_wgt_db(db_save_dir: str, save_id: str, underlying_assets_names: list[str]) -> CDbStruct:
     return CDbStruct(
         db_save_dir=db_save_dir,
@@ -226,6 +213,23 @@ def group_sim_args_by_factor_class(
         res[key].append(sim_args)
     return res
 
-# -----------------------------------------
-# ------ arguments about simulations ------
-# -----------------------------------------
+
+def group_sim_args_from_slc_fac(
+        factor_names: list[str], rets: TRets, signals_dir: str, ret_dir: str, cost: float
+) -> dict[TRetPrc, list[CSimArgs]]:
+    res: dict[TRetPrc, list[CSimArgs]] = {}
+    for ret in rets:
+        sim_args_list: list[CSimArgs] = []
+        ret_names = [ret.ret_name]
+        for factor_name in factor_names:
+            signal_id = factor_name
+            sim_args = CSimArgs(
+                sim_id=f"{signal_id}.{ret.ret_name}",
+                tgt_ret=ret,
+                db_struct_sig=gen_sig_db(db_save_dir=signals_dir, signal_id=signal_id),
+                db_struct_ret=gen_tst_ret_agg_db(db_save_root_dir=ret_dir, save_id=ret.save_id, rets=ret_names),
+                cost=cost,
+            )
+            sim_args_list.append(sim_args)
+        res[ret.ret_prc] = sim_args_list
+    return res

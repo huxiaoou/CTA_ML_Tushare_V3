@@ -1,5 +1,5 @@
 import itertools as ittl
-from typing import NewType, Literal
+from typing import NewType
 from enum import StrEnum
 from dataclasses import dataclass
 from husfort.qsqlite import CDbStruct
@@ -563,29 +563,6 @@ class CCfgFactorTA(CCfgFactor):
         return TFactorNames(names_ta)
 
 
-TGroupId = str
-
-
-@dataclass(frozen=True)
-class CFactorGroup:
-    group_id: TGroupId
-    members: TFactors
-
-    def groupby_class(self) -> dict[TFactorClass, TFactorNames]:
-        res: dict[TFactorClass, TFactorNames] = {}
-        for factor in self.members:
-            if factor.factor_class not in res:
-                res[factor.factor_class] = []
-            res[factor.factor_class].append(factor.factor_name)
-        return res
-
-    def names(self) -> TFactorNames:
-        return [factor.factor_name for factor in self.members]
-
-
-TFactorGroups = dict[TGroupId, CFactorGroup]
-
-
 @dataclass(frozen=True)
 class CCfgFactors:
     MTM: CCfgFactorMTM | None
@@ -634,20 +611,6 @@ class CCfgFactors:
         sub_grp = [CFactor(cfg_fac.factor_class, factor_name) for factor_name in cfg_fac.factor_names]
         return sub_grp
 
-    def get_factors_from_factor_group(self, group_id: str, factor_classes: list[TFactorClass]) -> CFactorGroup:
-        members: TFactors = []
-        for factor_class in factor_classes:
-            cls_mbrs = self.get_factors_from_factor_class(factor_class)
-            members.extend(cls_mbrs)
-        return CFactorGroup(group_id, members)
-
-    def get_factor_groups(self, factor_groups: dict[str, list[TFactorClass]]) -> TFactorGroups:
-        res: TFactorGroups = {}
-        for group_id, factor_classes in factor_groups.items():
-            factor_group = self.get_factors_from_factor_group(group_id, factor_classes)
-            res[group_id] = factor_group
-        return res
-
     def get_mapper_name_to_class(self) -> dict[TFactorName, TFactorClass]:
         factors = self.get_factors()
         d = {f.factor_name: f.factor_class for f in factors}
@@ -687,50 +650,12 @@ class CSimArgs:
 
 
 TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc]
-TSimGrpIdByFacGrp = tuple[TGroupId, TRetPrc]
 
 """
 --------------------------------
 Part V: models
 --------------------------------
 """
-
-
-@dataclass(frozen=True)
-class CModel:
-    model_type: Literal["Ridge", "LGBM", "XGB"]
-    model_args: dict
-
-    @property
-    def desc(self) -> str:
-        return f"{self.model_type}"
-
-
-TUniqueId = NewType("TUniqueId", str)
-
-
-@dataclass(frozen=True)
-class CTestMdl:
-    unique_Id: TUniqueId
-    ret: CRet
-    fac_grp: CFactorGroup
-    trn_win: int
-    model: CModel
-
-    @property
-    def layers(self) -> list[str]:
-        return [
-            self.unique_Id,  # M0005
-            self.ret.ret_name,  # ClsRtn001L1Neu
-            self.fac_grp.group_id,  # MTM, BASIS, etc
-            f"W{self.trn_win:03d}",  # W060
-            self.model.desc,  # Ridge
-        ]
-
-    @property
-    def save_tag_mdl(self) -> str:
-        return ".".join(self.layers)
-
 
 """
 --------------------------------
@@ -796,6 +721,7 @@ class CCfgProj:
     sig_frm_fac_agg_dir: str
     sim_frm_fac_agg_dir: str
     evl_frm_fac_agg_dir: str
+    opt_frm_slc_fac_dir: str
 
     # --- project parameters
     universe: TUniverse
@@ -808,7 +734,7 @@ class CCfgProj:
     decay: CCfgDecay
     optimize: dict
     factors: dict
-    factor_groups: dict[TGroupId, list[TFactorClass]]
+    selected_factors_pool: list
     cv: int
     mclrn: dict[str, dict]
 

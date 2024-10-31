@@ -67,6 +67,8 @@ proj_cfg = CCfgProj(
         _config["path"]["project_root_dir"], _config["path"]["sim_frm_fac_agg_dir"]),
     evl_frm_fac_agg_dir=os.path.join(  # type:ignore
         _config["path"]["project_root_dir"], _config["path"]["evl_frm_fac_agg_dir"]),
+    opt_frm_slc_fac_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["opt_frm_slc_fac_dir"]),
 
     universe=universe,
     avlb_unvrs=CCfgAvlbUnvrs(**_config["available"]),
@@ -79,7 +81,7 @@ proj_cfg = CCfgProj(
     decay=CCfgDecay(**_config["decay"]),
     optimize=_config["optimize"],
     factors=_config["factors"],
-    factor_groups=_config["factor_groups"],
+    selected_factors_pool=_config["selected_factors_pool"],
     cv=_config["cv"],
     mclrn=_config["mclrn"],
 )
@@ -191,4 +193,10 @@ if __name__ == "__main__":
     factors = cfg_factors.get_factors()
     print(f"Size of raw factors = {len(factors)}")
     for factor in factors:
+        print(factor)
+
+    print(sep)
+    selected_factors = proj_cfg.selected_factors_pool
+    print(f"Size of selected factors = {len(selected_factors)}")
+    for factor in selected_factors:
         print(factor)

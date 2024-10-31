@@ -52,3 +52,6 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass TA
 python main.py --bgn $bgn_date_sig --stp $stp_date signals --type facAgg
 python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type facAgg
 python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type facAgg
+
+# --- optimize for selected factors
+python main.py --bgn $bgn_date_mdl_prd --stp $stp_date optimize --type slcFac
