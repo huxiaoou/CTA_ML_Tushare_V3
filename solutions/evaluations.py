@@ -188,6 +188,8 @@ def plot_sim_args_list(
     )
     artist.plot()
     artist.set_legend()
+    artist.set_axis_x(xtick_count=20, xtick_label_size=8)
+    artist.add_vlines_from_index(vlines_index=["20240102", "20240902"], color="k")
     artist.save_and_close()
     return 0
 

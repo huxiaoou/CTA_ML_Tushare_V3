@@ -326,6 +326,13 @@ selected_factors_pool: [
   NOI060T05,
   RSPA240,
   RSLA240,
+#  TSD240,
+#  RWTC010U,
+#  RWTC010V,
+#  AMP060T03L,
+#  S0BETA240,
+#  SMTT06P,
+#  SMTT06R,
 ]
 
 # ------- models -------
