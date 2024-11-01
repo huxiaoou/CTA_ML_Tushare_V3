@@ -1,6 +1,6 @@
 import pandas as pd
 from rich.progress import track
-from loguru import logger
+# from loguru import logger
 from husfort.qutility import SFG, check_and_makedirs
 from husfort.qcalendar import CCalendar
 from husfort.qsqlite import CDbStruct, CMgrSqlDb
@@ -191,7 +191,7 @@ class CTstRetAgg(_CTstRet):
         return 0
 
     def main_test_return_agg(self, bgn_date: str, stp_date: str, calendar: CCalendar):
-        logger.info(f"Aggregating test return with lag = {SFG(self.lag)}, win = {SFG(self.win)}")
+        # logger.info(f"Aggregating test return with lag = {SFG(self.lag)}, win = {SFG(self.win)}")
         iter_dates = calendar.get_iter_list(bgn_date, stp_date)
         base_bgn_date = self.get_base_date(iter_dates[0], calendar)
         base_end_date = self.get_base_date(iter_dates[-1], calendar)
