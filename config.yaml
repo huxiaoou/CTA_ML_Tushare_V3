@@ -201,7 +201,7 @@ decay:
   rate: 0.3
   win: 10
 optimize:
-  win: 20
+  win: 60
   lbd: 10
 
 # ------- database structure -------
