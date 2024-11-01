@@ -57,3 +57,5 @@ python main.py --bgn $bgn_date_sig --stp $stp_date optimize --type slcFac
 python main.py --bgn $bgn_date_sig --stp $stp_date signals --type facOpt
 python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type facOpt
 python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type facOpt
+
+start E:\Data\Projects\CTA_ML_Tushare_V3\evl_frm_fac_opt\plot-nav\Cls.Opn.jpg

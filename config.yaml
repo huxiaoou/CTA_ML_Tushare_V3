@@ -198,8 +198,8 @@ prd:
 sim:
   wins: [ 1 ]
 decay:
-  rate: 0.3
-  win: 10
+  rate: 0.5
+  win: 20
 optimize:
   win: 20
   lbd: 0.01
@@ -314,7 +314,7 @@ factors:
     natr: 10
 
 selected_factors_pool: [
-  BASIS120,
+  BASIS060,
   CSP060T05,
   CTP060T05,
   CVP060T05,
@@ -326,6 +326,7 @@ selected_factors_pool: [
   NOI060T05,
   RSPA240,
   RSLA240,
+#  IBETA063,
 #  TSD240,
 #  RWTC010U,
 #  RWTC010V,
