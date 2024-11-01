@@ -202,7 +202,7 @@ decay:
   win: 10
 optimize:
   win: 20
-  lbd: 1
+  lbd: 0.1
 
 # ------- database structure -------
 db_struct:
@@ -320,6 +320,12 @@ selected_factors_pool: [
   CVP060T05,
   MTM240,
   MTM001,
+  SKEW120,
+  SKEW010,
+  NOI020T05,
+  NOI060T05,
+  RSPA240,
+  RSLA240,
 ]
 
 # ------- models -------
