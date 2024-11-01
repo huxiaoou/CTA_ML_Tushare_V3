@@ -446,6 +446,7 @@ if __name__ == "__main__":
                 input_sig_dir=proj_cfg.sig_frm_fac_agg_dir,
                 input_opt_dir=proj_cfg.opt_frm_slc_fac_dir,
                 signal_save_dir=proj_cfg.sig_frm_fac_opt_dir,
+                db_struct_avlb=db_struct_cfg.available,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,

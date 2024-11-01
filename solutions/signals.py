@@ -3,7 +3,7 @@ import pandas as pd
 import multiprocessing as mp
 from rich.progress import Progress, track
 from husfort.qutility import check_and_makedirs, error_handler
-from husfort.qsqlite import CMgrSqlDb
+from husfort.qsqlite import CMgrSqlDb, CDbStruct
 from husfort.qcalendar import CCalendar
 from solutions.shared import gen_sig_db, gen_fac_agg_db, gen_opt_wgt_db
 from typedef import CFactor, TFactors, TFactorNames, CSimArgs, TRetPrc
@@ -214,9 +214,11 @@ class CSignalFromOpt(_CSignal):
             self, group_id: TRetPrc, sim_args_list: list[CSimArgs],
             input_sig_dir: str,
             input_opt_dir: str,
-            signal_save_dir: str
+            signal_save_dir: str,
+            db_struct_avlb: CDbStruct,
     ):
         signal_id = group_id
+        self.db_struct_avlb = db_struct_avlb
         self.input_signal_ids: list[str] = [sim_args.sim_id for sim_args in sim_args_list]
         self.input_sig_dir = input_sig_dir
         self.input_opt_dir = input_opt_dir
@@ -225,6 +227,15 @@ class CSignalFromOpt(_CSignal):
     @property
     def underlying_assets_names(self) -> list[str]:
         return [input_signal_id.split(".")[0] for input_signal_id in self.input_signal_ids]
+
+    def load_available_data(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
+        sqldb = CMgrSqlDb(
+            db_save_dir=self.db_struct_avlb.db_save_dir,
+            db_name=self.db_struct_avlb.db_name,
+            table=self.db_struct_avlb.table,
+            mode="r",
+        )
+        return sqldb.read_by_range(bgn_date, stp_date)
 
     def load_opt(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
         db_struct_opt = gen_opt_wgt_db(
@@ -268,11 +279,34 @@ class CSignalFromOpt(_CSignal):
         optimized_data = pd.concat(res).reset_index().rename(columns={0: "weight"})
         return optimized_data
 
+    @staticmethod
+    def apply_risk_control(sig_data: pd.DataFrame, avlb_data: pd.DataFrame) -> pd.DataFrame:
+        def __normalize(s: pd.Series):
+            size = len(s)
+            u = 3 / size
+            if any(idx := s.abs().ge(u)):  # type:ignore
+                s[idx] = np.sign(s[idx]) * u
+            s = s / s.abs().sum()
+            return s
+
+        avlb_sig_data = pd.merge(
+            left=avlb_data[["trade_date", "instrument", "sectorL1"]],
+            right=sig_data,
+            on=["trade_date", "instrument"],
+            how="left",
+        )
+        adj_wgt_data = avlb_sig_data.groupby(by=["trade_date"], group_keys=False)["weight"].apply(__normalize)
+        avlb_sig_data["weight_adj"] = adj_wgt_data
+        risk_ctl_data = avlb_sig_data[["trade_date", "instrument", "weight_adj"]]
+        return risk_ctl_data.rename(columns={"weight_adj": "weight"})
+
     def core(self, input_data: pd.DataFrame, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
         sorted_data = input_data.sort_values(by="trade_date", ascending=True).fillna(0)
         opt_data = self.load_opt(bgn_date, stp_date)
         signal_data = self.apply_opt(sorted_data, opt_data)
-        return signal_data
+        avlb_data = self.load_available_data(bgn_date, stp_date)
+        adj_data = self.apply_risk_control(signal_data, avlb_data)
+        return adj_data
 
 
 def process_for_signal_from_opt(
@@ -281,11 +315,12 @@ def process_for_signal_from_opt(
         input_sig_dir: str,
         input_opt_dir: str,
         signal_save_dir: str,
+        db_struct_avlb: CDbStruct,
         bgn_date: str, stp_date: str, calendar: CCalendar,
 ):
     signal = CSignalFromOpt(
         group_id=group_id, sim_args_list=sim_args_list, input_sig_dir=input_sig_dir,
-        input_opt_dir=input_opt_dir, signal_save_dir=signal_save_dir,
+        input_opt_dir=input_opt_dir, signal_save_dir=signal_save_dir, db_struct_avlb=db_struct_avlb,
     )
     signal.main(bgn_date, stp_date, calendar)
     return 0
@@ -296,6 +331,7 @@ def main_signals_from_opt(
         input_sig_dir: str,
         input_opt_dir: str,
         signal_save_dir: str,
+        db_struct_avlb: CDbStruct,
         bgn_date: str,
         stp_date: str,
         calendar: CCalendar,
@@ -316,6 +352,7 @@ def main_signals_from_opt(
                             "input_sig_dir": input_sig_dir,
                             "input_opt_dir": input_opt_dir,
                             "signal_save_dir": signal_save_dir,
+                            "db_struct_avlb": db_struct_avlb,
                             "bgn_date": bgn_date,
                             "stp_date": stp_date,
                             "calendar": calendar,
@@ -333,6 +370,7 @@ def main_signals_from_opt(
                 input_sig_dir=input_sig_dir,
                 input_opt_dir=input_opt_dir,
                 signal_save_dir=signal_save_dir,
+                db_struct_avlb=db_struct_avlb,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,
