@@ -201,8 +201,8 @@ decay:
   rate: 0.3
   win: 10
 optimize:
-  win: 60
-  lbd: 10
+  win: 20
+  lbd: 1
 
 # ------- database structure -------
 db_struct:
@@ -318,6 +318,8 @@ selected_factors_pool: [
   CSP060T05,
   CTP060T05,
   CVP060T05,
+  MTM240,
+  MTM001,
 ]
 
 # ------- models -------
