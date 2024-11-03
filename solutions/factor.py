@@ -5,7 +5,7 @@ from rich.progress import track, Progress
 from husfort.qutility import SFY, error_handler, check_and_makedirs
 from husfort.qsqlite import CDbStruct, CMgrSqlDb
 from husfort.qcalendar import CCalendar
-from typedef import TFactorClass, TFactorNames, TUniverse, TFactorName
+from typedef import TFactorClass, TFactorNames, TUniverse
 from solutions.shared import gen_fac_raw_db, gen_fac_agg_db, neutralize_by_date
 
 

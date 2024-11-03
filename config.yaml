@@ -288,6 +288,8 @@ factors:
   WNDOI:
     wins: [ 20, 60, 120, 240 ]
     tops: [ 5 ]
+  SIZE:
+    wins: [ 60, 120, 240 ]
   AMP:
     wins: [ 60 ]
     lbds: [ 0.3, 0.6, 0.9 ]
@@ -326,14 +328,15 @@ selected_factors_pool: [
   NOI060T05,
   RSPA240,
   RSLA240,
-#  IBETA063,
-#  TSD240,
-#  RWTC010U,
-#  RWTC010V,
-#  AMP060T03L,
-#  S0BETA240,
-#  SMTT06P,
-#  SMTT06R,
+  SIZE240,
+  #  IBETA063,
+  #  TSD240,
+  #  RWTC010U,
+  #  RWTC010V,
+  #  AMP060T03L,
+  #  S0BETA240,
+  #  SMTT06P,
+  #  SMTT06R,
 ]
 
 # ------- models -------

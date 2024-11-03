@@ -401,6 +401,20 @@ class CCfgFactorWNDOI(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorSIZE(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("SIZE")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
 class CCfgFactorAMP(CCfgFactor):
     wins: list[int]
     lbds: list[float]
@@ -585,6 +599,7 @@ class CCfgFactors:
     NDOI: CCfgFactorNDOI | None
     WNOI: CCfgFactorWNOI | None
     WNDOI: CCfgFactorWNDOI | None
+    SIZE: CCfgFactorSIZE | None
     AMP: CCfgFactorAMP | None
     EXR: CCfgFactorEXR | None
     SMT: CCfgFactorSMT | None

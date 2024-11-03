@@ -39,6 +39,7 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass NOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass NDOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass WNOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass WNDOI
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass SIZE
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass AMP
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass EXR
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass SMT

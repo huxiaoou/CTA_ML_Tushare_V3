@@ -38,6 +38,7 @@ def parse_args():
                  "S0BETA", "S1BETA", "CBETA", "IBETA", "PBETA",
                  "CTP", "CTR", "CVP", "CVR", "CSP", "CSR",
                  "NOI", "NDOI", "WNOI", "WNDOI",
+                 "SIZE",
                  "AMP", "EXR", "SMT", "RWTC",
                  "TA",),
     )
@@ -337,6 +338,16 @@ if __name__ == "__main__":
                     db_struct_preprocess=db_struct_cfg.preprocess,
                     db_struct_pos=db_struct_cfg.position.copy_to_another(
                         another_db_save_dir=proj_cfg.by_instru_pos_dir),
+                )
+        elif fclass == "SIZE":
+            if (cfg := cfg_factors.SIZE) is not None:
+                from solutions.factorAlg import CFactorSIZE
+
+                fac = CFactorSIZE(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
                 )
         elif fclass == "AMP":
             if (cfg := cfg_factors.AMP) is not None:
