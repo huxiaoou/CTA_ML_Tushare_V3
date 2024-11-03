@@ -5,7 +5,7 @@ import itertools as ittl
 from rich.progress import Progress
 from husfort.qsqlite import CDbStruct, CSqlTable, CSqlVar
 from typedef import TFactorClass, TFactorName, TFactorNames, TFactors, CSimArgs, TRets, TRetPrc
-from typedef import TSimGrpIdByFacAgg
+from typedef import TSimGrpIdByFacAgg, CTestMdl, CRet, CModel, TUniqueId
 
 
 # ---------------------------------------
@@ -179,6 +179,18 @@ def gen_opt_wgt_db(db_save_dir: str, save_id: str, underlying_assets_names: list
     )
 
 
+def gen_prdct_db(db_save_root_dir: str, test: CTestMdl) -> CDbStruct:
+    return CDbStruct(
+        db_save_dir=db_save_root_dir,
+        db_name=f"{test.save_tag_mdl}.db",
+        table=CSqlTable(
+            name="prediction",
+            primary_keys=[CSqlVar("trade_date", "TEXT"), CSqlVar("instrument", "TEXT")],
+            value_columns=[CSqlVar(test.ret.ret_name, "REAL")],
+        )
+    )
+
+
 # -----------------------------------------
 # ------ arguments about simulations ------
 # -----------------------------------------
@@ -249,3 +261,15 @@ def group_sim_args_from_slc_fac(
             sim_args_list.append(sim_args)
         res[ret.ret_prc] = sim_args_list
     return res
+
+
+def gen_model_tests(config_models: dict[str, dict], factors: TFactors) -> list[CTestMdl]:
+    tests: list[CTestMdl] = []
+    for unique_id, m in config_models.items():
+        ret = CRet.parse_from_name(m["ret_name"])
+        model = CModel(model_type=m["model_type"], model_args=m["model_args"])
+        test = CTestMdl(
+            unique_Id=TUniqueId(unique_id), ret=ret, factors=factors, trn_win=m["trn_win"], model=model
+        )
+        tests.append(test)
+    return tests

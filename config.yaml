@@ -24,6 +24,10 @@ path:
   sig_frm_fac_opt_dir: sig_frm_fac_opt
   sim_frm_fac_opt_dir: sim_frm_fac_opt
   evl_frm_fac_opt_dir: evl_frm_fac_opt
+  mclrn_dir: mclrn
+  mclrn_cfg_file: config_models.yaml
+  mclrn_mdl_dir: models
+  mclrn_prd_dir: predictions
 
 
 mkt_idxes:
@@ -351,8 +355,8 @@ selected_factors_pool: [
 # ------- models -------
 cv: 5
 mclrn:
-  #  Ridge:
-  #    alpha: [ 100, 500, 1000, 5000 ]
+  Ridge:
+    alpha: [ 100, 500, 1000, 5000 ]
   LGBM:
     boosting_type: [ "gbdt" ]
     n_estimators: [ 3, 5, 10 ]
@@ -360,14 +364,14 @@ mclrn:
     num_leaves: [ 2, 4, 8 ]
     learning_rate: [ 0.01, 0.05, 0.1 ]
     metric: [ "l2" ]
-  #  XGB:
-  #    booster: [ "dart" ] # ["gbtree", "gblinear", "dart"]
-  #    n_estimators: [ 3, 5, 10 ]
-  #    max_depth: [ 3 ]
-  #    max_leaves: [ 2, 4, 8 ]
-  #    learning_rate: [ 0.01, 0.05, 0.1 ]
-  #    objective: [ "reg:squarederror" ]
-  #    grow_policy: [ "lossguide" ] # ["depthwise", "lossguide"]
+  XGB:
+    booster: [ "dart" ] # ["gbtree", "gblinear", "dart"]
+    n_estimators: [ 3, 5, 10 ]
+    max_depth: [ 3 ]
+    max_leaves: [ 2, 4, 8 ]
+    learning_rate: [ 0.01, 0.05, 0.1 ]
+    objective: [ "reg:squarederror" ]
+    grow_policy: [ "lossguide" ] # ["depthwise", "lossguide"]
 
 # ------- const -------
 CONST:

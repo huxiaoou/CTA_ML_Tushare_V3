@@ -1,5 +1,5 @@
 import itertools as ittl
-from typing import NewType
+from typing import NewType, Literal
 from enum import StrEnum
 from dataclasses import dataclass
 from husfort.qsqlite import CDbStruct
@@ -676,6 +676,15 @@ class CCfgFactors:
         d = {f.factor_name: f.factor_class for f in factors}
         return d
 
+    def get_factor_from_names(self, factor_names: TFactorNames) -> TFactors:
+        mapper = self.get_mapper_name_to_class()
+        res: TFactors = []
+        for factor_name in factor_names:
+            factor_class = mapper[factor_name]
+            factor = CFactor(factor_class, factor_name)
+            res.append(factor)
+        return res
+
 
 """
 --------------------------------------
@@ -716,6 +725,41 @@ TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc]
 Part V: models
 --------------------------------
 """
+
+TUniqueId = NewType("TUniqueId", str)
+
+
+@dataclass(frozen=True)
+class CModel:
+    model_type: Literal["Ridge", "LGBM", "XGB"]
+    model_args: dict
+
+    @property
+    def desc(self) -> str:
+        return f"{self.model_type}"
+
+
+@dataclass(frozen=True)
+class CTestMdl:
+    unique_Id: TUniqueId
+    ret: CRet
+    factors: TFactors
+    trn_win: int
+    model: CModel
+
+    @property
+    def layers(self) -> list[str]:
+        return [
+            self.unique_Id,  # M0005
+            self.ret.ret_name,  # ClsRtn001L1
+            f"W{self.trn_win:03d}",  # W060
+            self.model.desc,  # Ridge
+        ]
+
+    @property
+    def save_tag_mdl(self) -> str:
+        return ".".join(self.layers)
+
 
 """
 --------------------------------
@@ -785,6 +829,10 @@ class CCfgProj:
     sig_frm_fac_opt_dir: str
     sim_frm_fac_opt_dir: str
     evl_frm_fac_opt_dir: str
+    mclrn_dir: str
+    mclrn_cfg_file: str
+    mclrn_mdl_dir: str
+    mclrn_prd_dir: str
 
     # --- project parameters
     universe: TUniverse
