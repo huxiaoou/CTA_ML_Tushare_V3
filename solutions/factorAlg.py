@@ -12,7 +12,7 @@ from typedef import (
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC,
-    CCfgFactorTA,
+    CCfgFactorTA, CCfgFactorSIZE,
 )
 from solutions.factor import CFactorRaw
 
@@ -697,6 +697,25 @@ class CFactorWNOI(__CFactorMbrPos):
 class CFactorWNDOI(__CFactorMbrPos):
     def __init__(self, cfg: CCfgFactorWNDOI, **kwargs):
         super().__init__(cfg=cfg, **kwargs)
+
+
+class CFactorSIZE(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorSIZE, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
+        major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "oi_instru"],
+        )
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            oi_ma = major_data["oi_instru"].rolling(window=win, min_periods=int(win * 0.3)).mean()
+            major_data[factor_name] = major_data["oi_instru"] / oi_ma - 1
+        self.rename_ticker(major_data)
+        factor_data = self.get_factor_data(major_data, bgn_date)
+        return factor_data
 
 
 class CFactorAMP(CFactorRaw):
