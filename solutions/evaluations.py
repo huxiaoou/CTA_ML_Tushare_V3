@@ -144,6 +144,11 @@ def main_evl_sims(
     for header_var in header_vars[::-1]:
         evl_data.insert(loc=0, column=header_var, value=evl_data.pop(header_var))
 
+    if sim_type == "facOpt":
+        ret_prc = ", ".join(evl_data["ret_prc"].to_list())
+        ratio = ", ".join([f"{z:.4f}" for z in evl_data["sharpe+calmar"]])
+        print(f"sharpe+calmar:({ret_prc})=({ratio})")
+
     pd.set_option("display.max_rows", 40)
     pd.set_option("display.float_format", lambda z: f"{z:.4f}")
     print(evl_data)
@@ -151,11 +156,6 @@ def main_evl_sims(
     check_and_makedirs(evl_save_dir)
     evl_path = os.path.join(evl_save_dir, evl_save_file)
     evl_data.to_csv(evl_path, float_format="%.6f", index=False)
-
-    if sim_type == "facOpt":
-        ret_prc = ", ".join(evl_data["ret_prc"].to_list())
-        ratio = ", ".join([f"{z:.4f}" for z in evl_data["sharpe+calmar"]])
-        print(f"sharpe+calmar:({ret_prc})=({ratio})")
     return 0
 
 
