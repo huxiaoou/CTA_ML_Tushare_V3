@@ -280,6 +280,17 @@ def group_sim_args_from_slc_fac(
     return res
 
 
+def group_sim_args_by_ret_prc(sim_args_list: list[CSimArgs]) -> dict[TRetPrc, list[CSimArgs]]:
+    res: dict[TRetPrc, list[CSimArgs]] = {}
+    for sim_args in sim_args_list:
+        unique_id, ret_prc, trn_win, model, tgt_ret = sim_args.sim_id.split(".")
+        key = TRetPrc(ret_prc[0:3])
+        if key not in res:
+            res[key] = []
+        res[key].append(sim_args)
+    return res
+
+
 def gen_model_tests(config_models: dict[str, dict], factors: TFactors) -> list[CTestMdl]:
     tests: list[CTestMdl] = []
     for unique_id, m in config_models.items():

@@ -199,7 +199,7 @@ available:
   win: 5
   amount_threshold: 50000.00 # unit = WANYUAN, >= 50000 WANYUAN, or 500 million
 trn:
-  wins: [ 120, 240 ]
+  wins: [ 20, 30, 60 ]
 prd:
   wins: [ 5, 10 ]
 sim:

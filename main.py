@@ -564,7 +564,6 @@ if __name__ == "__main__":
         elif args.type == "mdlPrd":
             from solutions.mclrn_mdl_parser import load_config_models
             from solutions.shared import gen_model_tests, get_sim_args_mdl_prd
-            from solutions.signals import main_signals_from_mdl_prd
 
             config_models = load_config_models(cfg_mdl_dir=proj_cfg.mclrn_dir, cfg_mdl_file=proj_cfg.mclrn_cfg_file)
             factors = cfg_factors.get_factor_from_names(proj_cfg.selected_factors_pool)
@@ -573,7 +572,7 @@ if __name__ == "__main__":
                 tests=test_mdls,
                 signals_dir=proj_cfg.sig_frm_mdl_prd_dir,
                 ret_dir=proj_cfg.test_return_dir,
-                cost=proj_cfg.const.COST_SUB,
+                cost=proj_cfg.const.COST,
             )
             main_simulations(
                 sim_args_list=sim_args_list,
@@ -649,6 +648,41 @@ if __name__ == "__main__":
                 sim_save_dir=proj_cfg.sim_frm_fac_opt_dir,
                 plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_opt_dir, "plot-nav"),
                 bgn_date=bgn_date, stp_date=stp_date,
+            )
+        elif args.type == "mdlPrd":
+            from solutions.mclrn_mdl_parser import load_config_models
+            from solutions.shared import gen_model_tests, get_sim_args_mdl_prd, group_sim_args_by_ret_prc
+
+            config_models = load_config_models(cfg_mdl_dir=proj_cfg.mclrn_dir, cfg_mdl_file=proj_cfg.mclrn_cfg_file)
+            factors = cfg_factors.get_factor_from_names(proj_cfg.selected_factors_pool)
+            test_mdls = gen_model_tests(config_models=config_models, factors=factors)
+            sim_args_list = get_sim_args_mdl_prd(
+                tests=test_mdls,
+                signals_dir=proj_cfg.sig_frm_mdl_prd_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_evl_sims(
+                sim_type=args.type,
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_mdl_prd_dir,
+                evl_save_dir=proj_cfg.evl_frm_mdl_prd_dir,
+                evl_save_file="evaluations_for_mdl_prd.csv.gz",
+                header_vars=["sharpe+calmar", "sharpe", "calmar"],
+                sort_vars=["sharpe+calmar"],
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+            # plot by group
+            grouped_sim_args = group_sim_args_by_ret_prc(sim_args_list)
+            main_plt_grouped_sim_args(
+                grouped_sim_args=grouped_sim_args,
+                sim_save_dir=proj_cfg.sim_frm_mdl_prd_dir,
+                plt_save_dir=os.path.join(proj_cfg.evl_frm_mdl_prd_dir, "plot-nav"),
+                bgn_date=bgn_date,
+                stp_date=stp_date,
             )
         else:
             raise ValueError(f"args.type == {args.type} is illegal")

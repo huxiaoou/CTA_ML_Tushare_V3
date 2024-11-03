@@ -62,6 +62,8 @@ python main.py --bgn $bgn_date_sig --stp $stp_date signals --type facOpt
 python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type facOpt
 python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type facOpt
 
+start E:\Data\Projects\CTA_ML_Tushare_V3\evl_frm_fac_opt\plot-nav\Cls.Opn.jpg
+
 # --- machine learning models
 python main.py --bgn $bgn_date_mclrn --stp $stp_date mclrn --type parse
 python main.py --bgn $bgn_date_mclrn --stp $stp_date --processes 12 mclrn --type trnprd
@@ -71,4 +73,5 @@ python main.py --bgn $bgn_date_sig --stp $stp_date signals --type mdlPrd
 python main.py --bgn $bgn_date_sim --stp $stp_date simulations --type mdlPrd
 python main.py --bgn $bgn_date_sim --stp $stp_date evaluations --type mdlPrd
 
-start E:\Data\Projects\CTA_ML_Tushare_V3\evl_frm_fac_opt\plot-nav\Cls.Opn.jpg
+start E:\Data\Projects\CTA_ML_Tushare_V3\evl_frm_mdl_prd\plot-nav\Cls.jpg
+start E:\Data\Projects\CTA_ML_Tushare_V3\evl_frm_mdl_prd\plot-nav\Opn.jpg

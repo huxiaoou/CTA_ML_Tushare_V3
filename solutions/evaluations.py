@@ -86,6 +86,24 @@ class CEvlFacOpt(CEvlFrmSim):
         return 0
 
 
+class CEvlMdlPrd(CEvlFrmSim):
+    """
+    --- evaluations for machine learning models ---
+    """
+
+    def add_arguments(self, res: dict):
+        unique_id, ret_prc, trn_win, model, tgt_ret = self.sim_args.sim_id.split(".")
+        other_arguments = {
+            "unique_id": unique_id,
+            "ret_prc": ret_prc,
+            "trn_win": trn_win,
+            "model": model,
+            "tgt_ret": tgt_ret,
+        }
+        res.update(other_arguments)
+        return 0
+
+
 def process_for_evl_frm_sim(
         sim_type: str,
         sim_args: CSimArgs,
@@ -97,6 +115,8 @@ def process_for_evl_frm_sim(
         s = CEvlFacAgg(sim_args, sim_save_dir=sim_save_dir)
     elif sim_type == "facOpt":
         s = CEvlFacOpt(sim_args, sim_save_dir=sim_save_dir)
+    elif sim_type == "mdlPrd":
+        s = CEvlMdlPrd(sim_args, sim_save_dir=sim_save_dir)
     else:
         raise ValueError(f"sim type = {sim_type} is illegal")
     return s.main(bgn_date, stp_date)
