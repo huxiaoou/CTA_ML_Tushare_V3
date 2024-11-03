@@ -1,6 +1,6 @@
 $bgn_date = "20120104"
-$bgn_date_sig = "20170703" # signal bgn date
-$bgn_date_sim = "20180102" # simulation bgn date
+$bgn_date_sig = "20150701" # signal bgn date
+$bgn_date_sim = "20160104" # simulation bgn date
 $stp_date = "20241008"
 
 

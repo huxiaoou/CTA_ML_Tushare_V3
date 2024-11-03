@@ -33,7 +33,7 @@ class COptimizer:
         else:
             mu = ret_data.mean()
             cov = ret_data.cov()
-            bounds = [(-1.2 / p, 1.2 / p)] * p
+            bounds = [(-1.5 / p, 1.5 / p)] * p
             optimizer = COptimizerPortfolioUtility(m=mu.values, v=cov.values, lbd=self.lbd, bounds=bounds)
             result = optimizer.optimize()
             wgt = result.x if result.success else default_val
