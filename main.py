@@ -38,7 +38,7 @@ def parse_args():
                  "S0BETA", "S1BETA", "CBETA", "IBETA", "PBETA",
                  "CTP", "CTR", "CVP", "CVR", "CSP", "CSR",
                  "NOI", "NDOI", "WNOI", "WNDOI",
-                 "SIZE",
+                 "SIZE", "HR", "SR", "LIQUIDITY",
                  "AMP", "EXR", "SMT", "RWTC",
                  "TA",),
     )
@@ -344,6 +344,36 @@ if __name__ == "__main__":
                 from solutions.factorAlg import CFactorSIZE
 
                 fac = CFactorSIZE(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "HR":
+            if (cfg := cfg_factors.HR) is not None:
+                from solutions.factorAlg import CFactorHR
+
+                fac = CFactorHR(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "SR":
+            if (cfg := cfg_factors.SR) is not None:
+                from solutions.factorAlg import CFactorSR
+
+                fac = CFactorSR(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "LIQUIDITY":
+            if (cfg := cfg_factors.LIQUIDITY) is not None:
+                from solutions.factorAlg import CFactorLIQUIDITY
+
+                fac = CFactorLIQUIDITY(
                     cfg=cfg,
                     factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
                     universe=proj_cfg.universe,

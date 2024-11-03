@@ -415,6 +415,48 @@ class CCfgFactorSIZE(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorHR(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("HR")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
+class CCfgFactorSR(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("SR")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
+class CCfgFactorLIQUIDITY(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("LIQUIDITY")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
 class CCfgFactorAMP(CCfgFactor):
     wins: list[int]
     lbds: list[float]
@@ -600,6 +642,9 @@ class CCfgFactors:
     WNOI: CCfgFactorWNOI | None
     WNDOI: CCfgFactorWNDOI | None
     SIZE: CCfgFactorSIZE | None
+    HR: CCfgFactorHR | None
+    SR: CCfgFactorSR | None
+    LIQUIDITY: CCfgFactorLIQUIDITY | None
     AMP: CCfgFactorAMP | None
     EXR: CCfgFactorEXR | None
     SMT: CCfgFactorSMT | None

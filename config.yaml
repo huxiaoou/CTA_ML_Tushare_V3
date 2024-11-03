@@ -290,6 +290,12 @@ factors:
     tops: [ 5 ]
   SIZE:
     wins: [ 60, 120, 240 ]
+  HR:
+    wins: [ 60, 120, 240 ]
+  SR:
+    wins: [ 60, 120, 240 ]
+  LIQUIDITY:
+    wins: [ 60, 120, 240 ]
   AMP:
     wins: [ 60 ]
     lbds: [ 0.3, 0.6, 0.9 ]

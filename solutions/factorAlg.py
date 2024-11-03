@@ -12,7 +12,7 @@ from typedef import (
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC,
-    CCfgFactorTA, CCfgFactorSIZE,
+    CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY,
 )
 from solutions.factor import CFactorRaw
 
@@ -714,6 +714,67 @@ class CFactorSIZE(CFactorRaw):
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
             size_ma = major_data[size_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
             major_data[factor_name] = -(major_data[size_id] / size_ma - 1)
+        self.rename_ticker(major_data)
+        factor_data = self.get_factor_data(major_data, bgn_date)
+        return factor_data
+
+
+class CFactorHR(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorHR, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins) + 1, -5)
+        major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "oi_major", "vol_major"],
+        )
+        major_data["doi"] = (major_data["oi_major"] - major_data["oi_major"].shift(1)).fillna(0)
+        hr_id = "hedge_ratio"
+        major_data[hr_id] = major_data["doi"] / major_data["vol_major"]
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            major_data[factor_name] = major_data[hr_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
+        self.rename_ticker(major_data)
+        factor_data = self.get_factor_data(major_data, bgn_date)
+        return factor_data
+
+
+class CFactorSR(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorSR, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins) + 1, -5)
+        major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "oi_major", "vol_major"],
+        )
+        sr_id = "spec_ratio"
+        major_data[sr_id] = major_data["vol_major"] / major_data["oi_major"]
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            major_data[factor_name] = major_data[sr_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
+        self.rename_ticker(major_data)
+        factor_data = self.get_factor_data(major_data, bgn_date)
+        return factor_data
+
+
+class CFactorLIQUIDITY(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorLIQUIDITY, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins) + 1, -5)
+        major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "amount_major"],
+        )
+        liquidity_id = "liquidity"
+        major_data[liquidity_id] = major_data["return_c_major"].abs() * 1e8 / major_data["amount_major"]
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            major_data[factor_name] = major_data[liquidity_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
         return factor_data
