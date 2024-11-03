@@ -328,6 +328,7 @@ selected_factors_pool: [
   NOI060T05,
   RSPA240,
   RSLA240,
+  SIZE240,
   #  IBETA063,
   #  TSD240,
   #  RWTC010U,

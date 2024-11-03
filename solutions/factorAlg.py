@@ -706,13 +706,14 @@ class CFactorSIZE(CFactorRaw):
 
     def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
         win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
+        size_id = "oi_major"
         major_data = self.load_preprocess(
             instru, bgn_date=win_start_date, stp_date=stp_date,
-            values=["trade_date", "ticker_major", "return_c_major", "oi_instru"],
+            values=["trade_date", "ticker_major", "return_c_major", size_id],
         )
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
-            oi_ma = major_data["oi_instru"].rolling(window=win, min_periods=int(win * 0.3)).mean()
-            major_data[factor_name] = major_data["oi_instru"] / oi_ma - 1
+            size_ma = major_data[size_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
+            major_data[factor_name] = -(major_data[size_id] / size_ma - 1)
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
         return factor_data
