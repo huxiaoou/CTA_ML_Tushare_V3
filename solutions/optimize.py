@@ -33,8 +33,11 @@ class COptimizer:
         else:
             mu = ret_data.mean()
             cov = ret_data.cov()
-            bounds = [(-1.5 / p, 1.5 / p)] * p
-            optimizer = COptimizerPortfolioUtility(m=mu.values, v=cov.values, lbd=self.lbd, bounds=bounds)
+            bounds = [(-3.0 / p, 3.0 / p)] * p
+            optimizer = COptimizerPortfolioUtility(
+                m=mu.values, v=cov.values, lbd=self.lbd,
+                bounds=bounds, tot_mkt_val_bds=(0.0, 3.0)
+            )
             result = optimizer.optimize()
             wgt = result.x if result.success else default_val
         return pd.Series(data=wgt, index=self.x.columns.tolist())

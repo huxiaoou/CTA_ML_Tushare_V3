@@ -201,7 +201,7 @@ decay:
   rate: 0.5
   win: 20
 optimize:
-  win: 20
+  win: 60
   lbd: 0.01
 
 # ------- database structure -------
@@ -329,13 +329,13 @@ selected_factors_pool: [
   RSPA240,
   RSLA240,
   SIZE240,
+  SMTT04P,
+  #  RWTC010V,
   #  IBETA063,
   #  TSD240,
   #  RWTC010U,
-  #  RWTC010V,
   #  AMP060T03L,
   #  S0BETA240,
-  #  SMTT06P,
   #  SMTT06R,
 ]
 
