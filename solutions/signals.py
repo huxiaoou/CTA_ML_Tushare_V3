@@ -5,8 +5,8 @@ from rich.progress import Progress, track
 from husfort.qutility import check_and_makedirs, error_handler
 from husfort.qsqlite import CMgrSqlDb, CDbStruct
 from husfort.qcalendar import CCalendar
-from solutions.shared import gen_sig_db, gen_fac_agg_db, gen_opt_wgt_db
-from typedef import CFactor, TFactors, TFactorNames, CSimArgs, TRetPrc
+from solutions.shared import gen_sig_db, gen_fac_agg_db, gen_opt_wgt_db, gen_prdct_db
+from typedef import CFactor, TFactors, TFactorNames, CSimArgs, TRetPrc, CTestMdl
 
 
 class _CSignal:
@@ -371,6 +371,107 @@ def main_signals_from_opt(
                 input_opt_dir=input_opt_dir,
                 signal_save_dir=signal_save_dir,
                 db_struct_avlb=db_struct_avlb,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+            )
+    return 0
+
+
+"""
+-------------------------------------
+--- signals from model prediction ---
+-------------------------------------
+"""
+
+
+class CSignalFromMdlPrd(_CSignal):
+    def __init__(self, test: CTestMdl, mclrn_prd_dir: str, signal_save_dir: str, decay_rate: float, decay_win: int):
+        self.test = test
+        self.mclrn_prd_dir = mclrn_prd_dir
+        self.decay_rate, self.decay_win = decay_rate, decay_win
+        signal_id = test.save_tag_mdl
+        super().__init__(signal_save_dir=signal_save_dir, signal_id=signal_id)
+
+    def load_input(self, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        base_bgn_date = calendar.get_next_date(bgn_date, -self.decay_win + 1)
+        db_struct_prd = gen_prdct_db(db_save_root_dir=self.mclrn_prd_dir, test=self.test)
+        sqldb = CMgrSqlDb(
+            db_save_dir=db_struct_prd.db_save_dir,
+            db_name=db_struct_prd.db_name,
+            table=db_struct_prd.table,
+            mode="r",
+        )
+        data = sqldb.read_by_range(
+            bgn_date=base_bgn_date, stp_date=stp_date,
+            value_columns=["trade_date", "instrument", self.test.ret.ret_name],
+        )
+        return data
+
+    def core(self, input_data: pd.DataFrame, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        sorted_data = input_data.sort_values(
+            by=["trade_date", self.test.ret.ret_name, "instrument"], ascending=[True, False, True]
+        )
+        grouped_data = sorted_data.groupby(by=["trade_date"], group_keys=False)
+        signal_data = grouped_data.apply(self.map_factor_to_signal)
+        signal_data_ma = self.moving_average_signal(
+            signal_data, bgn_date=bgn_date, decay_rate=self.decay_rate, decay_win=self.decay_win)
+        return signal_data_ma
+
+
+def process_for_signal_from_mdl_prd(
+        test: CTestMdl, mclrn_prd_dir: str, signal_save_dir: str,
+        decay_rate: float, decay_win: int,
+        bgn_date: str, stp_date: str, calendar: CCalendar,
+):
+    signal = CSignalFromMdlPrd(test=test, mclrn_prd_dir=mclrn_prd_dir, signal_save_dir=signal_save_dir,
+                               decay_rate=decay_rate, decay_win=decay_win)
+    signal.main(bgn_date, stp_date, calendar)
+    return 0
+
+
+def main_signals_from_mdl_prd(
+        tests: list[CTestMdl],
+        mclrn_prd_dir: str,
+        signal_save_dir: str,
+        decay_rate: float, decay_win: int,
+        bgn_date: str,
+        stp_date: str,
+        calendar: CCalendar,
+        call_multiprocess: bool,
+        processes: int,
+):
+    desc = "Translating machine learning model predictions to signals"
+    if call_multiprocess:
+        with Progress() as pb:
+            main_task = pb.add_task(description=desc, total=len(tests))
+            with mp.get_context("spawn").Pool(processes) as pool:
+                for test in tests:
+                    pool.apply_async(
+                        process_for_signal_from_mdl_prd,
+                        kwds={
+                            "test": test,
+                            "mclrn_prd_dir": mclrn_prd_dir,
+                            "signal_save_dir": signal_save_dir,
+                            "decay_rate": decay_rate,
+                            "decay_win": decay_win,
+                            "bgn_date": bgn_date,
+                            "stp_date": stp_date,
+                            "calendar": calendar,
+                        },
+                        callback=lambda _: pb.update(main_task, advance=1),
+                        error_callback=error_handler,
+                    )
+                pool.close()
+                pool.join()
+    else:
+        for test in track(tests, description=desc):
+            process_for_signal_from_mdl_prd(
+                test=test,
+                mclrn_prd_dir=mclrn_prd_dir,
+                signal_save_dir=signal_save_dir,
+                decay_rate=decay_rate,
+                decay_win=decay_win,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,

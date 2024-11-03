@@ -81,6 +81,13 @@ proj_cfg = CCfgProj(
     evl_frm_fac_opt_dir=os.path.join(  # type:ignore
         _config["path"]["project_root_dir"], _config["path"]["evl_frm_fac_opt_dir"]),
 
+    sig_frm_mdl_prd_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sig_frm_mdl_prd_dir"]),
+    sim_frm_mdl_prd_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["sim_frm_mdl_prd_dir"]),
+    evl_frm_mdl_prd_dir=os.path.join(  # type:ignore
+        _config["path"]["project_root_dir"], _config["path"]["evl_frm_mdl_prd_dir"]),
+
     mclrn_dir=os.path.join(  # type:ignore
         _config["path"]["project_root_dir"], _config["path"]["mclrn_dir"],
     ),

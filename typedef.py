@@ -833,6 +833,9 @@ class CCfgProj:
     mclrn_cfg_file: str
     mclrn_mdl_dir: str
     mclrn_prd_dir: str
+    sig_frm_mdl_prd_dir: str
+    sim_frm_mdl_prd_dir: str
+    evl_frm_mdl_prd_dir: str
 
     # --- project parameters
     universe: TUniverse

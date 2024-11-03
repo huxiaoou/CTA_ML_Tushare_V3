@@ -45,15 +45,15 @@ def parse_args():
 
     # switch: signals
     arg_parser_sub = arg_parser_subs.add_parser(name="signals", help="generate signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt", "mdlPrd"))
 
     # switch: simulations
     arg_parser_sub = arg_parser_subs.add_parser(name="simulations", help="simulate from signals")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt", "mdlPrd"))
 
     # switch: evaluations
     arg_parser_sub = arg_parser_subs.add_parser(name="evaluations", help="evaluate simulations")
-    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt"))
+    arg_parser_sub.add_argument("--type", type=str, choices=("facAgg", "facOpt", "mdlPrd"))
 
     # switch: optimize
     arg_parser_sub = arg_parser_subs.add_parser(name="optimize", help="optimize portfolio and signals")
@@ -492,6 +492,27 @@ if __name__ == "__main__":
                 input_opt_dir=proj_cfg.opt_frm_slc_fac_dir,
                 signal_save_dir=proj_cfg.sig_frm_fac_opt_dir,
                 db_struct_avlb=db_struct_cfg.available,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
+        elif args.type == "mdlPrd":
+            from solutions.mclrn_mdl_parser import load_config_models
+            from solutions.shared import gen_model_tests
+            from solutions.signals import main_signals_from_mdl_prd
+
+            config_models = load_config_models(cfg_mdl_dir=proj_cfg.mclrn_dir, cfg_mdl_file=proj_cfg.mclrn_cfg_file)
+            factors = cfg_factors.get_factor_from_names(proj_cfg.selected_factors_pool)
+            test_mdls = gen_model_tests(config_models=config_models, factors=factors)
+
+            main_signals_from_mdl_prd(
+                tests=test_mdls,
+                mclrn_prd_dir=proj_cfg.mclrn_prd_dir,
+                signal_save_dir=proj_cfg.sig_frm_mdl_prd_dir,
+                decay_win=proj_cfg.decay.win,
+                decay_rate=proj_cfg.decay.rate,
                 bgn_date=bgn_date,
                 stp_date=stp_date,
                 calendar=calendar,
