@@ -561,6 +561,29 @@ if __name__ == "__main__":
                 call_multiprocess=not args.nomp,
                 processes=args.processes,
             )
+        elif args.type == "mdlPrd":
+            from solutions.mclrn_mdl_parser import load_config_models
+            from solutions.shared import gen_model_tests, get_sim_args_mdl_prd
+            from solutions.signals import main_signals_from_mdl_prd
+
+            config_models = load_config_models(cfg_mdl_dir=proj_cfg.mclrn_dir, cfg_mdl_file=proj_cfg.mclrn_cfg_file)
+            factors = cfg_factors.get_factor_from_names(proj_cfg.selected_factors_pool)
+            test_mdls = gen_model_tests(config_models=config_models, factors=factors)
+            sim_args_list = get_sim_args_mdl_prd(
+                tests=test_mdls,
+                signals_dir=proj_cfg.sig_frm_mdl_prd_dir,
+                ret_dir=proj_cfg.test_return_dir,
+                cost=proj_cfg.const.COST_SUB,
+            )
+            main_simulations(
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_mdl_prd_dir,
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                calendar=calendar,
+                call_multiprocess=not args.nomp,
+                processes=args.processes,
+            )
         else:
             raise ValueError(f"args.type == {args.type} is illegal")
     elif args.switch == "evaluations":
