@@ -105,7 +105,7 @@ class CFactorSKEW(CFactorRaw):
             values=["trade_date", "ticker_major", "return_c_major"],
         )
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
-            major_data[factor_name] = major_data["return_c_major"].rolling(window=win).skew()
+            major_data[factor_name] = -major_data["return_c_major"].rolling(window=win).skew()
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
         return factor_data
