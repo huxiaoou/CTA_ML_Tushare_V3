@@ -335,6 +335,7 @@ selected_factors_pool: [
   SKEW005,
   SIZE240,
   RSPA240,
+  RSLA240,
   SMTT02P,
 ]
 
