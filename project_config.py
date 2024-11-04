@@ -7,6 +7,7 @@ from typedef import (
     CCfgFactors,
     CCfgFactorMTM,
     CCfgFactorSKEW,
+    CCfgFactorKURT,
     CCfgFactorRS,
     CCfgFactorBASIS,
     CCfgFactorTS,
@@ -179,6 +180,7 @@ db_struct_cfg = CCfgDbStruct(
 cfg_factors = CCfgFactors(
     MTM=CCfgFactorMTM(**proj_cfg.factors["MTM"]),
     SKEW=CCfgFactorSKEW(**proj_cfg.factors["SKEW"]),
+    KURT=CCfgFactorKURT(**proj_cfg.factors["KURT"]),
     RS=CCfgFactorRS(**proj_cfg.factors["RS"]),
     BASIS=CCfgFactorBASIS(**proj_cfg.factors["BASIS"]),
     TS=CCfgFactorTS(**proj_cfg.factors["TS"]),

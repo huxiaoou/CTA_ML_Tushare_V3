@@ -249,6 +249,8 @@ factors:
     wins: [ 1, 3, 120, 240 ]
   SKEW:
     wins: [ 3, 5, 10, 20 ]
+  KURT:
+    wins: [ 3, 5, 10, 20 ]
   RS:
     wins: [ 60, 120, 240 ]
   BASIS:

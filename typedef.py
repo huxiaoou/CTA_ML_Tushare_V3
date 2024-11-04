@@ -115,6 +115,19 @@ class CCfgFactorSKEW(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorKURT(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("KURT")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        return TFactorNames([TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins])
+
+
+@dataclass(frozen=True)
 class CCfgFactorRS(CCfgFactor):
     wins: list[int]
 
@@ -623,6 +636,7 @@ class CCfgFactorTA(CCfgFactor):
 class CCfgFactors:
     MTM: CCfgFactorMTM | None
     SKEW: CCfgFactorSKEW | None
+    KURT: CCfgFactorKURT | None
     RS: CCfgFactorRS | None
     BASIS: CCfgFactorBASIS | None
     TS: CCfgFactorTS | None
