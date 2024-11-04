@@ -33,7 +33,7 @@ def parse_args():
     arg_parser_sub = arg_parser_subs.add_parser(name="factor", help="Calculate factor")
     arg_parser_sub.add_argument(
         "--fclass", type=str, help="factor class to run", required=True,
-        choices=("MTM", "SKEW",
+        choices=("MTM", "SKEW", "KURT",
                  "RS", "BASIS", "TS",
                  "S0BETA", "S1BETA", "CBETA", "IBETA", "PBETA",
                  "CTP", "CTR", "CVP", "CVR", "CSP", "CSR",
@@ -145,6 +145,16 @@ if __name__ == "__main__":
                 from solutions.factorAlg import CFactorSKEW
 
                 fac = CFactorSKEW(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "KURT":
+            if (cfg := cfg_factors.KURT) is not None:
+                from solutions.factorAlg import CFactorKURT
+
+                fac = CFactorKURT(
                     cfg=cfg,
                     factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
                     universe=proj_cfg.universe,
