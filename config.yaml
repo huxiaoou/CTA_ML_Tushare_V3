@@ -284,11 +284,11 @@ factors:
     wins: [ 60, 120 ]
     tops: [ 0.5, 0.9 ]
   NOI:
-    wins: [ 20, 60 ]
-    tops: [ 5 ]
+    wins: [ 10, 20, 60 ]
+    tops: [ 3, 10, 20 ]
   NDOI:
-    wins: [ 20, 60 ]
-    tops: [ 5 ]
+    wins: [ 10, 20, 60 ]
+    tops: [ 3, 10, 20 ]
   WNOI:
     wins: [ 20, 60, 120, 240 ]
     tops: [ 5 ]
@@ -310,7 +310,7 @@ factors:
     wins: [ 20, 60 ]
     dfts: [ 3 ]
   SMT:
-    lbds: [ 0.4, 0.6 ]
+    lbds: [ 0.2, 0.4, 0.6, 0.8 ]
   RWTC:
     wins: [ 5, 10, 20 ]
   TA:
@@ -334,24 +334,8 @@ selected_factors_pool: [
   CTP060T05,
   SKEW005,
   SIZE240,
-  #  MTM240,
-  #  MTM001,
-  #  SKEW120,
-  #  NOI020T05,
-  #  NOI060T05,
-  #  RSPA240,
-  #  RSLA240,
-  #  SIZE240,
-  #  SMTT04P,
-  #  HR240,
-  #  SR240,
-  #  RWTC010V,
-  #  IBETA063,
-  #  TSD240,
-  #  RWTC010U,
-  #  AMP060T03L,
-  #  S0BETA240,
-  #  SMTT06R,
+  RSPA240,
+  SMTT02P,
 ]
 
 # ------- models -------
