@@ -333,6 +333,7 @@ selected_factors_pool: [
   LIQUIDITY240,
   CTP060T05,
   SKEW005,
+  SIZE240,
   #  MTM240,
   #  MTM001,
   #  SKEW120,
