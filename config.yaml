@@ -339,6 +339,7 @@ selected_factors_pool: [
   SMTT02P,
   AMP060T06D,
   S0BETA020,
+  KURT010,
 ]
 
 # ------- models -------
