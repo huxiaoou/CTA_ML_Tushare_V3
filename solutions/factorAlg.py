@@ -12,7 +12,7 @@ from typedef import (
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC,
-    CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY,
+    CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
 
@@ -793,6 +793,27 @@ class CFactorLIQUIDITY(CFactorRaw):
         major_data[liquidity_id] = major_data["return_c_major"] * 1e8 / major_data["amount_major"]
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
             major_data[factor_name] = major_data[liquidity_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
+        self.rename_ticker(major_data)
+        factor_data = self.get_factor_data(major_data, bgn_date)
+        return factor_data
+
+
+class CFactorVSTD(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorVSTD, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins) + 1, -5)
+        major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "vol_major"],
+        )
+        vol_id = "vol_major"
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            mu = major_data[vol_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
+            sd = major_data[vol_id].rolling(window=win, min_periods=int(win * 0.3)).std()
+            major_data[factor_name] = (major_data[vol_id] - mu) / sd
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
         return factor_data
