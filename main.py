@@ -38,7 +38,7 @@ def parse_args():
                  "S0BETA", "S1BETA", "CBETA", "IBETA", "PBETA",
                  "CTP", "CTR", "CVP", "CVR", "CSP", "CSR",
                  "NOI", "NDOI", "WNOI", "WNDOI",
-                 "SIZE", "HR", "SR", "LIQUIDITY",
+                 "SIZE", "HR", "SR", "LIQUIDITY", "VSTD",
                  "AMP", "EXR", "SMT", "RWTC",
                  "TA",),
     )
@@ -388,6 +388,16 @@ if __name__ == "__main__":
                 from solutions.factorAlg import CFactorLIQUIDITY
 
                 fac = CFactorLIQUIDITY(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "VSTD":
+            if (cfg := cfg_factors.VSTD) is not None:
+                from solutions.factorAlg import CFactorVSTD
+
+                fac = CFactorVSTD(
                     cfg=cfg,
                     factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
                     universe=proj_cfg.universe,

@@ -305,6 +305,8 @@ factors:
     wins: [ 60, 120, 240 ]
   LIQUIDITY:
     wins: [ 60, 120, 240 ]
+  VSTD:
+    wins: [ 20, 60, 120, 240 ]
   AMP:
     wins: [ 60 ]
     lbds: [ 0.3, 0.6, 0.9 ]
