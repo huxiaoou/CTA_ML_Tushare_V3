@@ -12,6 +12,7 @@ from typedef import CSimArgs, TRetPrc
 class COptimizer:
     CONST_SAFE_SHIFT = 32  # make sure it's long enough to cover last month end trade date
     CONST_SAFE_RET_LENGTH = 10
+    CONST_ANNUAL_FAC = 250
 
     def __init__(self, x: pd.DataFrame, lbd: float, win: int, save_dir: str, save_id: str):
         """
@@ -31,12 +32,13 @@ class COptimizer:
         if n < self.CONST_SAFE_RET_LENGTH:
             wgt = default_val
         else:
-            mu = ret_data.mean()
-            cov = ret_data.cov()
+            mu = ret_data.mean() * self.CONST_ANNUAL_FAC
+            cov = ret_data.cov() * self.CONST_ANNUAL_FAC
             bounds = [(-2.0 / p, 2.0 / p)] * p
             optimizer = COptimizerPortfolioUtility(
                 m=mu.values, v=cov.values, lbd=self.lbd,
-                bounds=bounds, tot_mkt_val_bds=(0.0, 2.0)
+                bounds=bounds, tot_mkt_val_bds=(0.0, 2.0),
+                tol=1e-1,
             )
             result = optimizer.optimize()
             wgt = result.x if result.success else default_val

@@ -335,15 +335,16 @@ factors:
 selected_factors_pool: [
   BASIS060,
   LIQUIDITY240,
-  CTP060T05,
-  SKEW005,
   SIZE240,
+  SKEW005,
+  KURT010,
+  CTP120T09,
   RSPA240,
   RSLA240,
   SMTT02P,
   AMP060T06D,
   S0BETA020,
-  KURT010,
+#  VSTD020,
 ]
 
 # ------- models -------

@@ -413,7 +413,7 @@ class __CFactorCXY(CFactorRaw):
                     break
                 sub_data = raw_data.iloc[i - win + 1: i + 1]
                 r_data[trade_date] = cal_top_corr(sub_data, x=x, y=y, sort_var=sort_var, top_size=top_size)
-            raw_data[factor_name] = pd.Series(r_data)
+            raw_data[factor_name] = -pd.Series(r_data)
         return 0
 
 
@@ -813,7 +813,7 @@ class CFactorVSTD(CFactorRaw):
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
             mu = major_data[vol_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
             sd = major_data[vol_id].rolling(window=win, min_periods=int(win * 0.3)).std()
-            major_data[factor_name] = (major_data[vol_id] - mu) / sd
+            major_data[factor_name] = -(major_data[vol_id] - mu) / sd
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
         return factor_data
