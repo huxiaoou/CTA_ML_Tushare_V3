@@ -341,17 +341,18 @@ selected_factors_pool: [
   CTP120T09,
   RSPA240,
   RSLA240,
-  SMTT02P,
   AMP060T06D,
   S0BETA020,
-#  VSTD020,
+  SMTT02P,
+  #  VSTD020,
+  #  RWTC005U,
 ]
 
 # ------- models -------
 cv: 5
 mclrn:
   Ridge:
-    alpha: [ 0.01, 1, 10]
+    alpha: [ 0.01, 1, 10 ]
   LGBM:
     boosting_type: [ "gbdt" ]
     n_estimators: [ 3, 5, 10 ]
