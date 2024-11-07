@@ -344,6 +344,8 @@ selected_factors_pool: [
   AMP060T06D,
   S0BETA020,
   SMTT02P,
+  #  TAOBVT10,
+  #  TARSIT10,
   #  VSTD020,
   #  RWTC005U,
 ]

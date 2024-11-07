@@ -205,6 +205,7 @@ def plot_sim_args_list(
         fig_save_dir=plt_save_dir,
         fig_save_type="jpg",
         colormap="jet",
+        line_width=1,
     )
     artist.plot()
     artist.set_legend()
