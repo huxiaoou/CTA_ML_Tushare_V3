@@ -423,7 +423,7 @@ class CCfgFactorSPDWEB(CCfgFactor):
 
     @property
     def factor_names(self) -> TFactorNames:
-        n0 = [TFactorName(f"{self.factor_class}{int(prop * 10):02d}") for prop in self.props]
+        n0 = [TFactorName(f"{self.factor_class}{int(prop * 100):02d}") for prop in self.props]
         return TFactorNames(n0)
 
 

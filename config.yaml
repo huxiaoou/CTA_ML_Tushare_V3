@@ -209,7 +209,7 @@ decay:
   win: 20
 optimize:
   win: 60
-  lbd: 100
+  lbd: 100.0
 
 # ------- database structure -------
 db_struct:
@@ -298,7 +298,7 @@ factors:
     wins: [ 20, 60, 120, 240 ]
     tops: [ 5 ]
   SPDWEB:
-    props: [ 0.2, 0.4 ]
+    props: [ 0.2, 0.4, 0.5 ]
   SIZE:
     wins: [ 60, 120, 240 ]
   HR:
@@ -342,14 +342,14 @@ selected_factors_pool: [
   KURT010,
   CTP120T09,
   RSPA240,
-  RSLA240,
   AMP060T06D,
   S0BETA020,
   SMTT02P,
-  #  TAOBVT10,
-  #  TARSIT10,
-  #  VSTD020,
-  #  RWTC005U,
+  SPDWEB40,
+  VSTD020,
+#  TAOBVT10,
+#  TARSIT10,
+#  RWTC005U,
 ]
 
 # ------- models -------
