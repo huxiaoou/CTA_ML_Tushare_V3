@@ -10,7 +10,7 @@ from typedef import (
     CCfgFactorCBETA, CCfgFactorIBETA, CCfgFactorPBETA,
     CCfgFactorCTP, CCfgFactorCVP, CCfgFactorCSP,
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
-    CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI,
+    CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
@@ -715,6 +715,57 @@ class CFactorWNOI(__CFactorMbrPos):
 class CFactorWNDOI(__CFactorMbrPos):
     def __init__(self, cfg: CCfgFactorWNDOI, **kwargs):
         super().__init__(cfg=cfg, **kwargs)
+
+
+class CFactorSPDWEB(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorSPDWEB, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_spdweb(self, trade_date_data: pd.DataFrame) -> pd.Series:
+        n = len(trade_date_data)
+        res = {}
+        for prop, factor_name in zip(self.cfg.props, self.factor_names):
+            k = max(int(n * prop), 1)
+            its = trade_date_data.head(k)["trd_senti"].mean()
+            uts = trade_date_data.tail(k)["trd_senti"].mean()
+            res[factor_name] = its - uts
+        return pd.Series(res)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = bgn_date
+
+        # load adj major data as header
+        adj_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "oi_instru"],
+        )
+
+        # load member
+        pos_data = self.load_pos(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=[
+                "trade_date", "ts_code", "broker",
+                "vol", "long_hld", "long_chg", "short_hld", "short_chg",
+                "code_type"
+            ]
+        )
+
+        cntrct_pos_data = pos_data.query("code_type == 0 and long_hld > 50 and short_hld > 50").dropna(
+            axis=0, how="any", subset=["vol", "long_hld", "long_chg", "short_hld", "short_chg"],
+        )
+        cntrct_pos_data["stat"] = (cntrct_pos_data["long_hld"] + cntrct_pos_data["short_hld"]) / cntrct_pos_data["vol"]
+        cntrct_pos_data["abs_chg_sum"] = cntrct_pos_data["long_chg"].abs() + cntrct_pos_data["short_chg"].abs()
+        cntrct_pos_data["dlt_chg"] = cntrct_pos_data["long_chg"] - cntrct_pos_data["short_chg"]
+        cntrct_pos_data["trd_senti"] = cntrct_pos_data["dlt_chg"] / cntrct_pos_data["abs_chg_sum"]
+        cntrct_pos_data = cntrct_pos_data.sort_values(by=["trade_date", "stat"], ascending=[True, False])
+        res_df = cntrct_pos_data.groupby(by="trade_date").apply(self.cal_spdweb).reset_index()
+        adj_data = pd.merge(left=adj_data, right=res_df, on="trade_date", how="left")
+        self.rename_ticker(adj_data)
+        factor_data = self.get_factor_data(adj_data, bgn_date)
+        return factor_data
 
 
 class CFactorSIZE(CFactorRaw):

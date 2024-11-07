@@ -40,6 +40,7 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass NOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass NDOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass WNOI
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass WNDOI
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass SPDWEB
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass SIZE
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass HR
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass SR

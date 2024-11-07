@@ -297,6 +297,8 @@ factors:
   WNDOI:
     wins: [ 20, 60, 120, 240 ]
     tops: [ 5 ]
+  SPDWEB:
+    props: [ 0.2, 0.4 ]
   SIZE:
     wins: [ 60, 120, 240 ]
   HR:

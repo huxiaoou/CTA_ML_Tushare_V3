@@ -414,6 +414,20 @@ class CCfgFactorWNDOI(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorSPDWEB(CCfgFactor):
+    props: list[float]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("SPDWEB")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{int(prop * 10):02d}") for prop in self.props]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
 class CCfgFactorSIZE(CCfgFactor):
     wins: list[int]
 
@@ -669,6 +683,7 @@ class CCfgFactors:
     NDOI: CCfgFactorNDOI | None
     WNOI: CCfgFactorWNOI | None
     WNDOI: CCfgFactorWNDOI | None
+    SPDWEB: CCfgFactorSPDWEB | None
     SIZE: CCfgFactorSIZE | None
     HR: CCfgFactorHR | None
     SR: CCfgFactorSR | None
