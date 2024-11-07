@@ -34,11 +34,13 @@ class COptimizer:
         else:
             mu = ret_data.mean() * self.CONST_ANNUAL_FAC
             cov = ret_data.cov() * self.CONST_ANNUAL_FAC
-            bounds = [(-2.0 / p, 2.0 / p)] * p
+            bounds = [(0.5 / p, 1.5 / p)] * p
             optimizer = COptimizerPortfolioUtility(
                 m=mu.values, v=cov.values, lbd=self.lbd,
+                # x0=np.sign(mu) / p,
+                x0="aver",
                 bounds=bounds, tot_mkt_val_bds=(0.0, 2.0),
-                tol=1e-1,
+                tol=1e-2,
             )
             result = optimizer.optimize()
             wgt = result.x if result.success else default_val

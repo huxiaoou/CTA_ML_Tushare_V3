@@ -209,7 +209,7 @@ decay:
   win: 20
 optimize:
   win: 60
-  lbd: 0.01
+  lbd: 100
 
 # ------- database structure -------
 db_struct:
