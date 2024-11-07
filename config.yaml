@@ -333,6 +333,7 @@ factors:
     adosc: [ 3, 10 ]
     obv: 10
     natr: 10
+    ma3: [5, 10, 20]
 
 selected_factors_pool: [
   BASIS060,

@@ -581,6 +581,7 @@ class CCfgFactorTA(CCfgFactor):
     adosc: tuple[int, int]
     obv: int
     natr: int
+    ma3: list[int]
 
     @property
     def factor_class(self) -> TFactorClass:
@@ -651,11 +652,17 @@ class CCfgFactorTA(CCfgFactor):
         return TFactorName(f"{self.factor_class}NATRT{timeperiod}")
 
     @property
+    def name_ma3(self) -> TFactorName:
+        fast, mid, slow = self.ma3
+        return TFactorName(f"{self.factor_class}F{fast}M{mid}S{slow}")
+
+    @property
     def factor_names(self) -> TFactorNames:
         names_ta = [
             self.name_macd, self.name_bbands, self.name_sar, self.name_adx,
             self.name_bop, self.name_cci, self.name_cmo, self.name_rsi, self.name_mfi,
             self.name_willr, self.name_adosc, self.name_obv, self.name_natr,
+            self.name_ma3,
         ]
         return TFactorNames(names_ta)
 

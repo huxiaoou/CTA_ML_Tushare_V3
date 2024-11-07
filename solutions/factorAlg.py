@@ -1193,6 +1193,16 @@ class CFactorTA(CFactorRaw):
         timeperiod = self.cfg.natr
         return ta.NATR(high, low, close, timeperiod=timeperiod)
 
+    def __cal_ma3(self, close: pd.Series) -> pd.Series:
+        fast, mid, slow = self.cfg.ma3
+        srs_fast = close.rolling(window=fast).mean()
+        srs_mid = close.rolling(window=mid).mean()
+        srs_slow = close.rolling(window=slow).mean()
+        d0 = srs_fast / srs_mid - 1
+        d1 = srs_mid / srs_slow - 1
+        a = 1 / 3
+        return d0 * a + d1 * (1 - a)
+
     def cal_factor_by_instru(self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar) -> pd.DataFrame:
         win_start_date = "20120104"
         major_data = self.load_preprocess(
@@ -1220,6 +1230,7 @@ class CFactorTA(CFactorRaw):
         major_data[self.cfg.name_adosc] = self.__cal_adosc(high=high, low=low, close=close, volume=volume)
         major_data[self.cfg.name_obv] = self.__cal_obv(close=close, volume=volume)
         major_data[self.cfg.name_natr] = self.__cal_natr(high=high, low=low, close=close)
+        major_data[self.cfg.name_ma3] = self.__cal_ma3(close=close)
 
         self.rename_ticker(major_data)
         factor_data = self.get_factor_data(major_data, bgn_date)
