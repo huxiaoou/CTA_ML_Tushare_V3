@@ -322,6 +322,8 @@ factors:
     lbds: [ 0.2, 0.4, 0.6, 0.8 ]
   RWTC:
     wins: [ 5, 10, 20 ]
+  TAILS:
+    wins: [ 15, 30, 45, 60 ]
   TA:
     macd: [ 10, 20, 7 ]
     bbands: [ 10, 2, 2 ]

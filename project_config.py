@@ -37,6 +37,7 @@ from typedef import (
     CCfgFactorEXR,
     CCfgFactorSMT,
     CCfgFactorRWTC,
+    CCfgFactorTAILS,
     CCfgFactorTA,
 )
 
@@ -213,6 +214,7 @@ cfg_factors = CCfgFactors(
     EXR=CCfgFactorEXR(**proj_cfg.factors["EXR"]),
     SMT=CCfgFactorSMT(**proj_cfg.factors["SMT"]),
     RWTC=CCfgFactorRWTC(**proj_cfg.factors["RWTC"]),
+    TAILS=CCfgFactorTAILS(**proj_cfg.factors["TAILS"]),
     TA=CCfgFactorTA(**proj_cfg.factors["TA"]),
 )
 
