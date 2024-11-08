@@ -10,6 +10,7 @@ from typedef import (
     CCfgFactorCBETA, CCfgFactorIBETA, CCfgFactorPBETA,
     CCfgFactorCTP, CCfgFactorCVP, CCfgFactorCSP,
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
+    CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
@@ -401,6 +402,7 @@ class __CFactorCXY(CFactorRaw):
             x: str, y: str,
             wins: list[int], tops: list[float],
             sort_var: str,
+            direction: int = -1,
     ):
         for win, top in ittl.product(wins, tops):
             factor_name = f"{self.factor_class}{win:03d}T{int(top * 10):02d}"
@@ -413,7 +415,7 @@ class __CFactorCXY(CFactorRaw):
                     break
                 sub_data = raw_data.iloc[i - win + 1: i + 1]
                 r_data[trade_date] = cal_top_corr(sub_data, x=x, y=y, sort_var=sort_var, top_size=top_size)
-            raw_data[factor_name] = -pd.Series(r_data)
+            raw_data[factor_name] = pd.Series(r_data) * direction
         return 0
 
 
@@ -580,6 +582,35 @@ class CFactorCSR(__CFactorCXY):
         adj_data = adj_data.set_index("trade_date")
         adj_data["sigma"] = adj_data["return_c_major"].fillna(0).rolling(window=__near_short_term).std()
         x, y = "sigma", "return_c_major"
+        self.cal_rolling_top_corr(
+            adj_data,
+            bgn_date=bgn_date, stp_date=stp_date,
+            x=x, y=y,
+            wins=self.cfg.wins, tops=self.cfg.tops,
+            sort_var="vol_major",
+        )
+        adj_data = adj_data.reset_index()
+        self.rename_ticker(adj_data)
+        factor_data = self.get_factor_data(adj_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorCOV(__CFactorCXY):
+    def __init__(self, cfg: CCfgFactorCOV, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        __near_short_term = 10
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins + [__near_short_term]), -5)
+        adj_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "vol_major", "oi_major"],
+        )
+        adj_data = adj_data.set_index("trade_date")
+        x, y = "vol_major", "oi_major"
         self.cal_rolling_top_corr(
             adj_data,
             bgn_date=bgn_date, stp_date=stp_date,

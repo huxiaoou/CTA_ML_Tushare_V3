@@ -285,6 +285,9 @@ factors:
   CSR:
     wins: [ 60, 120 ]
     tops: [ 0.5, 0.9 ]
+  COV:
+    wins: [ 20, 30, 60 ]
+    tops: [ 0.3, 0.5, 0.9 ]
   NOI:
     wins: [ 10, 20, 60 ]
     tops: [ 3, 10, 20 ]
@@ -333,7 +336,7 @@ factors:
     adosc: [ 3, 10 ]
     obv: 10
     natr: 10
-    ma3: [5, 10, 20]
+    ma3: [ 5, 10, 20 ]
 
 selected_factors_pool: [
   BASIS060,
@@ -348,9 +351,10 @@ selected_factors_pool: [
   SMTT02P,
   SPDWEB40,
   VSTD020,
-#  TAOBVT10,
-#  TARSIT10,
-#  RWTC005U,
+  COV030T05,
+  #  TAOBVT10,
+  #  TARSIT10,
+  #  RWTC005U,
 ]
 
 # ------- models -------

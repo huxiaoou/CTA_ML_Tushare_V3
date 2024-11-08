@@ -36,7 +36,7 @@ def parse_args():
         choices=("MTM", "SKEW", "KURT",
                  "RS", "BASIS", "TS",
                  "S0BETA", "S1BETA", "CBETA", "IBETA", "PBETA",
-                 "CTP", "CTR", "CVP", "CVR", "CSP", "CSR",
+                 "CTP", "CTR", "CVP", "CVR", "CSP", "CSR", "COV",
                  "NOI", "NDOI", "WNOI", "WNDOI", "SPDWEB",
                  "SIZE", "HR", "SR", "LIQUIDITY", "VSTD",
                  "AMP", "EXR", "SMT", "RWTC",
@@ -300,6 +300,16 @@ if __name__ == "__main__":
                 from solutions.factorAlg import CFactorCSR
 
                 fac = CFactorCSR(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                )
+        elif fclass == "COV":
+            if (cfg := cfg_factors.COV) is not None:
+                from solutions.factorAlg import CFactorCOV
+
+                fac = CFactorCOV(
                     cfg=cfg,
                     factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
                     universe=proj_cfg.universe,

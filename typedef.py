@@ -354,6 +354,22 @@ class CCfgFactorCSR(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorCOV(CCfgFactor):
+    wins: list[int]
+    tops: list[float]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("COV")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}T{int(t * 10):02d}") for w, t in
+              ittl.product(self.wins, self.tops)]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
 class CCfgFactorNOI(CCfgFactor):
     wins: list[int]
     tops: list[int]
@@ -686,6 +702,7 @@ class CCfgFactors:
     CVR: CCfgFactorCVR | None
     CSP: CCfgFactorCSP | None
     CSR: CCfgFactorCSR | None
+    COV: CCfgFactorCOV | None
     NOI: CCfgFactorNOI | None
     NDOI: CCfgFactorNDOI | None
     WNOI: CCfgFactorWNOI | None
