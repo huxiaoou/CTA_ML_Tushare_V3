@@ -795,10 +795,10 @@ Part IV: Simulations
 @dataclass(frozen=True)
 class CSimArgs:
     sim_id: str
-    tgt_ret: CRet
-    db_struct_sig: CDbStruct
-    db_struct_ret: CDbStruct
-    cost: float
+    tgt_ret: CRet | None
+    db_struct_sig: CDbStruct | None
+    db_struct_ret: CDbStruct | None
+    cost: float | None
 
 
 TSimGrpIdByFacAgg = tuple[TFactorClass, TRetPrc]
@@ -934,6 +934,7 @@ class CCfgProj:
     selected_factors_pool: list
     cv: int
     mclrn: dict[str, dict]
+    omega: dict
 
     @property
     def test_rets_wins(self) -> list[int]:
@@ -964,3 +965,6 @@ class CCfgDbStruct:
     # --- project database
     available: CDbStruct
     market: CDbStruct
+
+
+TPid = NewType("TPid", str)

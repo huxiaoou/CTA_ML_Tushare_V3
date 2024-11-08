@@ -598,6 +598,7 @@ if __name__ == "__main__":
             )
         elif args.type == "facOpt":
             from solutions.shared import get_sim_args_fac_opt
+            from solutions.simulations import main_simu_from_nav
 
             sim_args_list = get_sim_args_fac_opt(
                 rets=proj_cfg.get_test_rets(),
@@ -613,6 +614,14 @@ if __name__ == "__main__":
                 calendar=calendar,
                 call_multiprocess=not args.nomp,
                 processes=args.processes,
+            )
+            main_simu_from_nav(
+                save_id=proj_cfg.omega["pid"],
+                portfolio_ids=proj_cfg.omega["components"],
+                bgn_date=bgn_date,
+                stp_date=stp_date,
+                sim_save_dir=proj_cfg.sim_frm_fac_opt_dir,
+                calendar=calendar,
             )
         elif args.type == "mdlPrd":
             from solutions.mclrn_mdl_parser import load_config_models
@@ -674,14 +683,14 @@ if __name__ == "__main__":
                 stp_date=stp_date,
             )
         elif args.type == "facOpt":
-            from solutions.shared import get_sim_args_fac_opt
+            from solutions.shared import get_sim_args_fac_opt, get_sim_args_omega
 
             sim_args_list = get_sim_args_fac_opt(
                 rets=proj_cfg.get_test_rets(),
                 signals_dir=proj_cfg.sig_frm_fac_opt_dir,
                 ret_dir=proj_cfg.test_return_dir,
                 cost=proj_cfg.const.COST,
-            )
+            ) + [get_sim_args_omega(omega_id=proj_cfg.omega["pid"])]
             main_evl_sims(
                 sim_type=args.type,
                 sim_args_list=sim_args_list,
@@ -696,11 +705,13 @@ if __name__ == "__main__":
                 processes=args.processes,
             )
             plot_sim_args_list(
-                fig_name="Cls.Opn",
+                fig_name="Cls.Opn.Omega",
                 sim_args_list=sim_args_list,
                 sim_save_dir=proj_cfg.sim_frm_fac_opt_dir,
                 plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_opt_dir, "plot-nav"),
                 bgn_date=bgn_date, stp_date=stp_date,
+                line_style=["-.", "-.", "-"],
+                line_color=["#000080", "#006400", "#8B0000"]
             )
         elif args.type == "mdlPrd":
             from solutions.mclrn_mdl_parser import load_config_models

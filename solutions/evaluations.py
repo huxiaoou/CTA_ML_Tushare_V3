@@ -77,7 +77,10 @@ class CEvlFacOpt(CEvlFrmSim):
     """
 
     def add_arguments(self, res: dict):
-        ret_prc, tgt_ret = self.sim_args.sim_id.split(".")
+        if self.sim_args.sim_id == "P-OMEGA":
+            ret_prc, tgt_ret = "001L1", "001L1"
+        else:
+            ret_prc, tgt_ret = self.sim_args.sim_id.split(".")
         other_arguments = {
             "ret_prc": ret_prc,
             "tgt_ret": tgt_ret,
@@ -191,6 +194,9 @@ def plot_sim_args_list(
         sim_args_list: list[CSimArgs],
         sim_save_dir: str, plt_save_dir: str,
         bgn_date: str, stp_date: str,
+        colormap: str = "jet",
+        line_style: list[str] = None,
+        line_color: list[str] = None,
 ):
     check_and_makedirs(plt_save_dir)
     ret_data_by_sim = {}
@@ -199,13 +205,16 @@ def plot_sim_args_list(
         ret_data_by_sim[sim_args.sim_id] = s.get_ret(bgn_date, stp_date)
     ret_data = pd.DataFrame(ret_data_by_sim)
     nav_data = (1 + ret_data).cumprod()
+
     artist = CPlotLines(
         plot_data=nav_data,
         fig_name=fig_name,
         fig_save_dir=plt_save_dir,
         fig_save_type="jpg",
-        colormap="jet",
+        colormap=colormap,
         line_width=1,
+        line_style=line_style,
+        line_color=line_color,
     )
     artist.plot()
     artist.set_legend()

@@ -360,6 +360,11 @@ selected_factors_pool: [
   #  RWTC005U,
 ]
 
+omega:
+  pid: "P-OMEGA"
+  components: [ "Cls.Cls001L1", "Opn.Opn001L1" ]
+
+
 # ------- models -------
 cv: 5
 mclrn:

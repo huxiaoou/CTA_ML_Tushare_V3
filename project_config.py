@@ -118,6 +118,7 @@ proj_cfg = CCfgProj(
     selected_factors_pool=_config["selected_factors_pool"],
     cv=_config["cv"],
     mclrn=_config["mclrn"],
+    omega=_config["omega"],
 )
 
 # ---------- databases structure ----------

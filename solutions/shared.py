@@ -227,6 +227,16 @@ def get_sim_args_fac_opt(rets: TRets, signals_dir: str, ret_dir: str, cost: floa
     return res
 
 
+def get_sim_args_omega(omega_id: str) -> CSimArgs:
+    return CSimArgs(
+        sim_id=omega_id,
+        tgt_ret=None,
+        db_struct_sig=None,
+        db_struct_ret=None,
+        cost=None,
+    )
+
+
 def get_sim_args_mdl_prd(tests: list[CTestMdl], signals_dir: str, ret_dir: str, cost: float) -> list[CSimArgs]:
     res: list[CSimArgs] = []
     for test in tests:
