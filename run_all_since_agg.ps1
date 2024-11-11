@@ -4,7 +4,6 @@ $bgn_date_sig = "20150701" # signal bgn date
 $bgn_date_sim = "20160104" # simulation bgn date
 $stp_date = "20241008"
 
-
 # ------------------------
 # --- remove existence ---
 # ------------------------
