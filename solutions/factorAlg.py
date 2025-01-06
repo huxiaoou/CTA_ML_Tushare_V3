@@ -14,7 +14,7 @@ from typedef import (
     CCfgFactorCTR, CCfgFactorCVR, CCfgFactorCSR,
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
-    CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS,
+    CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1178,6 +1178,41 @@ class CFactorTAILS(CFactorRaw):
         adj_minb_data["freq_ret"] = adj_minb_data["close"] / adj_minb_data["pre_close"] - 1
         adj_minb_data["freq_ret"] = adj_minb_data["freq_ret"].fillna(0)
         tails_data = adj_minb_data.groupby(by="trade_date").apply(self.cal_tails_return, ret="freq_ret")
+        input_data = pd.merge(
+            left=adj_major_data,
+            right=tails_data,
+            left_on="trade_date",
+            right_index=True,
+            how="left",
+        )
+        self.rename_ticker(input_data)
+        factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorHEADS(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorHEADS, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_heads_return(self, tday_minb_data: pd.DataFrame, ret: str) -> pd.Series:
+        res = {}
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            res[factor_name] = -tday_minb_data[ret].head(win).mean() * 1e4
+        return pd.Series(res)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max_win=2, shift=-5)
+        adj_major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major"],
+        )
+        adj_minb_data = self.load_minute_bar(instru, bgn_date=win_start_date, stp_date=stp_date)
+        adj_minb_data["freq_ret"] = adj_minb_data["close"] / adj_minb_data["pre_close"] - 1
+        adj_minb_data["freq_ret"] = adj_minb_data["freq_ret"].fillna(0)
+        tails_data = adj_minb_data.groupby(by="trade_date").apply(self.cal_heads_return, ret="freq_ret")
         input_data = pd.merge(
             left=adj_major_data,
             right=tails_data,

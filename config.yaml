@@ -322,6 +322,8 @@ factors:
     wins: [ 5, 10, 20 ]
   TAILS:
     wins: [ 15, 30, 45, 60 ]
+  HEADS:
+    wins: [ 15, 30, 45, 60 ]
   TA:
     macd: [ 10, 20, 7 ]
     bbands: [ 10, 2, 2 ]
@@ -350,12 +352,8 @@ selected_factors_pool: [
   S0BETA020,
   SMTT02P,
   SPDWEB40,
-  VSTD020,
   COV030T05,
   TAILS015,
-  #  TAOBVT10,
-  #  TARSIT10,
-  #  RWTC005U,
 ]
 
 omega:
