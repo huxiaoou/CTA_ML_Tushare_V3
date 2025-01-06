@@ -185,10 +185,8 @@ universe:
   CS.DCE:
     sectorL0: C
     sectorL1: AGR
-  RR.DCE:
-    sectorL0: C
-    sectorL1: AGR
 
+  # "RR.DCE",
   # "UR.ZCE",
   # "FG.ZCE",
   # "SA.ZCE",
