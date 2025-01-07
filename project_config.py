@@ -40,6 +40,7 @@ from typedef import (
     CCfgFactorTAILS,
     CCfgFactorHEADS,
     CCfgFactorTOPS,
+    CCfgFactorDOV,
     CCfgFactorTA,
 )
 
@@ -221,6 +222,7 @@ cfg_factors = CCfgFactors(
     HEADS=CCfgFactorHEADS(**proj_cfg.factors["HEADS"]),
     TOPS=CCfgFactorTOPS(**proj_cfg.factors["TOPS"]),
     TA=CCfgFactorTA(**proj_cfg.factors["TA"]),
+    DOV=CCfgFactorDOV(**proj_cfg.factors["DOV"]),
 )
 
 if __name__ == "__main__":

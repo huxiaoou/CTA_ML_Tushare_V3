@@ -13,7 +13,7 @@ from typedef import (
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
-    CCfgFactorTOPS,
+    CCfgFactorTOPS, CCfgFactorDOV,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1263,6 +1263,59 @@ class CFactorTOPS(CFactorRaw):
         )
         for factor_name in self.cfg.factor_names:
             input_data[factor_name] = -np.sign(input_data[factor_name]) * input_data["adj_ratio"]
+        self.rename_ticker(input_data)
+        factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorDOV(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorDOV, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_dov(self, tday_minb_data: pd.DataFrame, dov: str) -> pd.Series:
+        mu = tday_minb_data[dov].mean() * 1e2
+        sd = tday_minb_data[dov].std() * 1e2
+        ratio = (mu / sd) if sd > 0 else 0
+        return pd.Series({
+            f"{self.cfg.factor_class}MEAN": mu,
+            f"{self.cfg.factor_class}STD": sd,
+            f"{self.cfg.factor_class}RATIO": ratio,
+        })
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max_win=max(self.cfg.wins), shift=-5)
+        adj_major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "vol_major"],
+        )
+        adj_minb_data = self.load_minute_bar(instru, bgn_date=win_start_date, stp_date=stp_date)
+        adj_minb_data["doi"] = adj_minb_data["oi"].diff()
+        adj_minb_data["dov"] = adj_minb_data["doi"].abs() / adj_minb_data["vol"].where(adj_minb_data["vol"] > 0, np.nan)
+        adj_minb_data["dov"] = adj_minb_data["dov"].where(adj_minb_data["dov"] <= 1, np.nan)
+        dov_data = adj_minb_data.groupby(by="trade_date").apply(self.cal_dov, dov="dov")
+        input_data = pd.merge(
+            left=adj_major_data,
+            right=dov_data,
+            left_on="trade_date",
+            right_index=True,
+            how="left",
+        )
+        m_names = [
+            f"{self.cfg.factor_class}MEAN",
+            f"{self.cfg.factor_class}STD",
+            f"{self.cfg.factor_class}RATIO",
+        ]
+        for win in self.cfg.wins:
+            f_names = [
+                f"{self.cfg.factor_class}MEAN{win:02d}",
+                f"{self.cfg.factor_class}STD{win:02d}",
+                f"{self.cfg.factor_class}RATIO{win:02d}",
+            ]
+            for m_name, factor_name in zip(m_names, f_names):
+                input_data[factor_name] = input_data[m_name] - input_data[m_name].rolling(window=win).mean()
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data

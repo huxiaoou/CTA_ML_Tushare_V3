@@ -326,6 +326,8 @@ factors:
     wins: [ 15, 30, 45, 60 ]
   TOPS:
     ratios: [ 0.2, 0.4, 0.6 ]
+  DOV:
+    wins: [ 5, 10, 20 ]
   TA:
     macd: [ 10, 20, 7 ]
     bbands: [ 10, 2, 2 ]
@@ -356,6 +358,8 @@ selected_factors_pool: [
   SPDWEB40,
   COV030T05,
   TAILS015,
+#  DOVMEAN05,
+#  TS120,
 ]
 
 omega:

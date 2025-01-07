@@ -625,6 +625,22 @@ class CCfgFactorTOPS(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorDOV(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("DOV")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}MEAN{w:02d}") for w in self.wins]
+        n1 = [TFactorName(f"{self.factor_class}STD{w:02d}") for w in self.wins]
+        n2 = [TFactorName(f"{self.factor_class}RATIO{w:02d}") for w in self.wins]
+        return TFactorNames(n0 + n1 + n2)
+
+
+@dataclass(frozen=True)
 class CCfgFactorTA(CCfgFactor):
     macd: tuple[int, int, int]
     bbands: tuple[int, int, int]
@@ -762,6 +778,7 @@ class CCfgFactors:
     TAILS: CCfgFactorTAILS | None
     HEADS: CCfgFactorHEADS | None
     TOPS: CCfgFactorTOPS | None
+    DOV: CCfgFactorDOV | None
     TA: CCfgFactorTA | None
 
     def values(self) -> list[CCfgFactor]:
