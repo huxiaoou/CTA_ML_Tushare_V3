@@ -358,8 +358,8 @@ selected_factors_pool: [
   SPDWEB40,
   COV030T05,
   TAILS015,
-#  DOVMEAN05,
-#  TS120,
+  DOVMEAN05,
+  TS120,
 ]
 
 omega:
