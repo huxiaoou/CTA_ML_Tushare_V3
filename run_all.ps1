@@ -2,7 +2,7 @@ $bgn_date = "20120104"
 $bgn_date_mclrn = "20150601"
 $bgn_date_sig = "20150701" # signal bgn date
 $bgn_date_sim = "20160104" # simulation bgn date
-$stp_date = "20241101"
+$stp_date = "20250101"
 
 # ------------------------
 # --- remove existence ---
@@ -52,6 +52,8 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass EXR
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass SMT
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass RWTC
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass TAILS
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass HEADS
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass TOPS
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass TA
 
 # --- single factor test

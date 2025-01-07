@@ -3,8 +3,6 @@ import pandas as pd
 import talib as ta
 import itertools as ittl
 from husfort.qcalendar import CCalendar
-from pandas.core.array_algos.transforms import shift
-
 from typedef import (
     CCfgFactorMTM, CCfgFactorSKEW, CCfgFactorKURT, CCfgFactorRS,
     CCfgFactorBASIS, CCfgFactorTS,
@@ -15,6 +13,7 @@ from typedef import (
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
+    CCfgFactorTOPS,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1220,6 +1219,50 @@ class CFactorHEADS(CFactorRaw):
             right_index=True,
             how="left",
         )
+        self.rename_ticker(input_data)
+        factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorTOPS(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorTOPS, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_tops_return(self, tday_minb_data: pd.DataFrame, ret: str, sort_var: str) -> pd.Series:
+        res = {}
+        for ratio, factor_name in zip(self.cfg.ratios, self.factor_names):
+            sorted_data = tday_minb_data.sort_values(by=sort_var, ascending=False)
+            sorted_data["idx"] = sorted_data[sort_var].cumsum()
+            vol_sum = sorted_data[sort_var].sum()
+            threshold = vol_sum * ratio
+            slc_data = sorted_data.query(f"idx <= {threshold}")
+            res[factor_name] = slc_data[ret].mean() * 1e4
+        return pd.Series(res)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max_win=10, shift=-5)
+        adj_major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "vol_major"],
+        )
+        adj_major_data["vol_ma"] = adj_major_data["vol_major"].rolling(window=10).mean()
+        adj_major_data["adj_ratio"] = adj_major_data["vol_major"] / adj_major_data["vol_ma"]
+        adj_minb_data = self.load_minute_bar(instru, bgn_date=win_start_date, stp_date=stp_date)
+        adj_minb_data["freq_ret"] = adj_minb_data["close"] / adj_minb_data["pre_close"] - 1
+        adj_minb_data["freq_ret"] = adj_minb_data["freq_ret"].fillna(0)
+        tops_data = adj_minb_data.groupby(by="trade_date").apply(self.cal_tops_return, ret="freq_ret", sort_var="vol")
+        input_data = pd.merge(
+            left=adj_major_data,
+            right=tops_data,
+            left_on="trade_date",
+            right_index=True,
+            how="left",
+        )
+        for factor_name in self.cfg.factor_names:
+            input_data[factor_name] = -np.sign(input_data[factor_name]) * input_data["adj_ratio"]
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data

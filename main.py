@@ -39,7 +39,7 @@ def parse_args():
                  "CTP", "CTR", "CVP", "CVR", "CSP", "CSR", "COV",
                  "NOI", "NDOI", "WNOI", "WNDOI", "SPDWEB",
                  "SIZE", "HR", "SR", "LIQUIDITY", "VSTD",
-                 "AMP", "EXR", "SMT", "RWTC", "TAILS", "HEADS",
+                 "AMP", "EXR", "SMT", "RWTC", "TAILS", "HEADS", "TOPS",
                  "TA",),
     )
 
@@ -484,6 +484,17 @@ if __name__ == "__main__":
                 from solutions.factorAlg import CFactorHEADS
 
                 fac = CFactorHEADS(
+                    cfg=cfg,
+                    factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
+                    universe=proj_cfg.universe,
+                    db_struct_preprocess=db_struct_cfg.preprocess,
+                    db_struct_minute_bar=db_struct_cfg.minute_bar,
+                )
+        elif fclass == "TOPS":
+            if (cfg := cfg_factors.TOPS) is not None:
+                from solutions.factorAlg import CFactorTOPS
+
+                fac = CFactorTOPS(
                     cfg=cfg,
                     factors_by_instru_dir=proj_cfg.factors_by_instru_dir,
                     universe=proj_cfg.universe,

@@ -611,6 +611,20 @@ class CCfgFactorHEADS(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorTOPS(CCfgFactor):
+    ratios: list[float]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("TOPS")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{int(ratio * 100):02d}") for ratio in self.ratios]
+        return TFactorNames(n0)
+
+
+@dataclass(frozen=True)
 class CCfgFactorTA(CCfgFactor):
     macd: tuple[int, int, int]
     bbands: tuple[int, int, int]
@@ -747,6 +761,7 @@ class CCfgFactors:
     RWTC: CCfgFactorRWTC | None
     TAILS: CCfgFactorTAILS | None
     HEADS: CCfgFactorHEADS | None
+    TOPS: CCfgFactorTOPS | None
     TA: CCfgFactorTA | None
 
     def values(self) -> list[CCfgFactor]:

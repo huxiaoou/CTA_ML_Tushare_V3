@@ -53,6 +53,7 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass SMT
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass RWTC
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass TAILS
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass HEADS
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass TOPS
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass TA
 
 # --- single factor test
