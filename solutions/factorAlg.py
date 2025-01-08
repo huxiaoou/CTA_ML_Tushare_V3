@@ -1262,7 +1262,7 @@ class CFactorTOPS(CFactorRaw):
             how="left",
         )
         for factor_name in self.cfg.factor_names:
-            input_data[factor_name] = -np.sign(input_data[factor_name]) * input_data["adj_ratio"]
+            input_data[factor_name] = -np.sign(input_data[factor_name]) * (input_data["adj_ratio"]**2)
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data
