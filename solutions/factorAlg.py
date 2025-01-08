@@ -48,13 +48,13 @@ def cal_rolling_corr(df: pd.DataFrame, x: str, y: str, rolling_window: int) -> p
 
 
 def cal_rolling_beta(df: pd.DataFrame, x: str, y: str, rolling_window: int) -> pd.Series:
-    df["xy"] = (df[x] * df[y]).rolling(window=rolling_window).mean()
-    df["xx"] = (df[x] * df[x]).rolling(window=rolling_window).mean()
-    df["x"] = df[x].rolling(window=rolling_window).mean()
-    df["y"] = df[y].rolling(window=rolling_window).mean()
-    df["cov_xy"] = df["xy"] - df["x"] * df["y"]
-    df["cov_xx"] = df["xx"] - df["x"] * df["x"]
-    s = df["cov_xy"] / df["cov_xx"]
+    xyb = (df[x] * df[y]).rolling(window=rolling_window).mean()
+    xxb = (df[x] * df[x]).rolling(window=rolling_window).mean()
+    xb = df[x].rolling(window=rolling_window).mean()
+    yb = df[y].rolling(window=rolling_window).mean()
+    cov_xy = xyb - xb * yb
+    cov_xx = xxb - xb * xb
+    s = cov_xy / cov_xx
     return s
 
 
@@ -265,8 +265,8 @@ class CFactorS0BETA(__CFactorBETA):
     def cal_factor_by_instru(
             self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
     ) -> pd.DataFrame:
-        # __x_ret = "INH0100_NHF" if self.universe[instru].sectorL0 == "C" else "I881001_WI"
-        __x_ret = "market"
+        __x_ret = "INH0100_NHF" if self.universe[instru].sectorL0 == "C" else "I881001_WI"
+        # __x_ret = "market"
         __y_ret = "return_c_major"
         win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
         adj_major_data = self.load_preprocess(
@@ -1263,7 +1263,7 @@ class CFactorTOPS(CFactorRaw):
             how="left",
         )
         for factor_name in self.cfg.factor_names:
-            input_data[factor_name] = -np.sign(input_data[factor_name]) * (input_data["adj_ratio"]**2)
+            input_data[factor_name] = -np.sign(input_data[factor_name]) * (input_data["adj_ratio"] ** 2)
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data

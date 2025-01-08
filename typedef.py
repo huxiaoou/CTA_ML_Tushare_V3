@@ -184,9 +184,9 @@ class CCfgFactorS0BETA(CCfgFactor):
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
         # n1 = [TFactorName(f"{self.factor_class}{self.wins[0]:03d}D{w:03d}") for w in self.wins[1:]]
-        # n2 = [f"{self.factor_class}{w:03d}RES" for w in self.wins]
+        n2 = [f"{self.factor_class}{w:03d}RES" for w in self.wins]
         # n3 = [f"{self.factor_class}{w:03d}RESSTD" for w in self.wins]
-        return TFactorNames(n0)
+        return TFactorNames(n0 + n2)
 
 
 @dataclass(frozen=True)
@@ -201,9 +201,9 @@ class CCfgFactorS1BETA(CCfgFactor):
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
         # n1 = [TFactorName(f"{self.factor_class}{self.wins[0]:03d}D{w:03d}") for w in self.wins[1:]]
-        # n2 = [f"{self.factor_class}{w:03d}RES" for w in self.wins]
+        n2 = [f"{self.factor_class}{w:03d}RES" for w in self.wins]
         # n3 = [f"{self.factor_class}{w:03d}RESSTD" for w in self.wins]
-        return TFactorNames(n0)
+        return TFactorNames(n0 + n2)
 
 
 @dataclass(frozen=True)
