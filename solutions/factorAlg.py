@@ -265,7 +265,8 @@ class CFactorS0BETA(__CFactorBETA):
     def cal_factor_by_instru(
             self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
     ) -> pd.DataFrame:
-        __x_ret = "INH0100_NHF" if self.universe[instru].sectorL0 == "C" else "I881001_WI"
+        # __x_ret = "INH0100_NHF" if self.universe[instru].sectorL0 == "C" else "I881001_WI"
+        __x_ret = "market"
         __y_ret = "return_c_major"
         win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
         adj_major_data = self.load_preprocess(
