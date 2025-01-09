@@ -328,6 +328,10 @@ factors:
     ratios: [ 0.2, 0.4, 0.6 ]
   DOV:
     wins: [ 5, 10, 20 ]
+  RES:
+    wins: [ 5, 10, 20, 60, 120 ]
+  VOL:
+    wins: [ 5, 10, 20, 60, 120 ]
   TA:
     macd: [ 10, 20, 7 ]
     bbands: [ 10, 2, 2 ]
@@ -360,6 +364,7 @@ selected_factors_pool: [
   TAILS015,
   DOVMEAN05,
   TS120,
+  RES010,
 ]
 
 omega:

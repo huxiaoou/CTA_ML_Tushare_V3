@@ -13,7 +13,7 @@ from typedef import (
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
-    CCfgFactorTOPS, CCfgFactorDOV,
+    CCfgFactorTOPS, CCfgFactorDOV, CCfgFactorRES, CCfgFactorVOL,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1319,6 +1319,50 @@ class CFactorDOV(CFactorRaw):
                 input_data[factor_name] = input_data[m_name] - input_data[m_name].rolling(window=win).mean()
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorRES(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorRES, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
+        adj_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major", "basis_rate"],
+        )
+        for win, factor_name in zip(self.cfg.wins, self.cfg.factor_names):
+            beta = f"b{win:03d}"
+            adj_data[beta] = cal_rolling_beta(adj_data, x="basis_rate", y="return_c_major", rolling_window=win)
+            adj_data[factor_name] = adj_data["return_c_major"] - adj_data[beta] * adj_data["basis_rate"]
+        self.rename_ticker(adj_data)
+        factor_data = self.get_factor_data(adj_data, bgn_date)
+        return factor_data
+
+
+class CFactorVOL(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorVOL, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
+        adj_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major"],
+        )
+        for win, factor_name in zip(self.cfg.wins, self.cfg.factor_names):
+            volatility = f"v{win:03d}"
+            adj_data[volatility] = adj_data["return_c_major"].rolling(window=win).std() * 1e2
+            adj_data[factor_name] = adj_data[volatility] / adj_data[volatility].rolling(window=10).mean() - 1
+        self.rename_ticker(adj_data)
+        factor_data = self.get_factor_data(adj_data, bgn_date)
         return factor_data
 
 
