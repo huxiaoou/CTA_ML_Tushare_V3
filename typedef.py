@@ -653,7 +653,8 @@ class CCfgFactorRES(CCfgFactor):
     @property
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
-        return TFactorNames(n0)
+        n1 = [TFactorName(f"{self.factor_class}DIF")]
+        return TFactorNames(n0 + n1)
 
 
 @dataclass(frozen=True)

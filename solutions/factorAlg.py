@@ -1348,6 +1348,7 @@ class CFactorRES(CFactorRaw):
             beta = f"b{win:03d}"
             adj_data[beta] = cal_rolling_beta(adj_data, x="basis_rate", y="return_c_major", rolling_window=win)
             adj_data[factor_name] = adj_data["return_c_major"] - adj_data[beta] * adj_data["basis_rate"]
+        adj_data[f"{self.factor_class}DIF"] = adj_data["RES010"] - adj_data["RES060"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
         return factor_data
