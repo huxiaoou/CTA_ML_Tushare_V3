@@ -692,6 +692,9 @@ class __CFactorMbrPos(CFactorRaw):
         noi_df["net"] = noi_df[["noi_sum", "oi_instru"]].apply(self.__robust_rate, axis=1)
         return noi_df[["net"]]
 
+    def cal_diff(self, res: pd.DataFrame):
+        pass
+
     def cal_factor_by_instru(
             self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
     ) -> pd.DataFrame:
@@ -722,6 +725,7 @@ class __CFactorMbrPos(CFactorRaw):
                 factor_name = f"{self.factor_class}{win:03d}T{top:02d}"
                 res[factor_name] = net_data["net"].rolling(window=win, min_periods=mp).mean()
         res_df = pd.DataFrame(res).reset_index()
+        self.cal_diff(res_df)
 
         # merge to header
         adj_data = pd.merge(left=adj_data, right=res_df, on="trade_date", how="left")
@@ -733,6 +737,9 @@ class __CFactorMbrPos(CFactorRaw):
 class CFactorNOI(__CFactorMbrPos):
     def __init__(self, cfg: CCfgFactorNOI, **kwargs):
         super().__init__(cfg=cfg, **kwargs)
+
+    def cal_diff(self, res: pd.DataFrame):
+        res[f"{self.factor_class}DIF"] = res["NOI020T20"] - res["NOI060T03"]
 
 
 class CFactorNDOI(__CFactorMbrPos):

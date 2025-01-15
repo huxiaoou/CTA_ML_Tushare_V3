@@ -381,7 +381,8 @@ class CCfgFactorNOI(CCfgFactor):
     @property
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}T{t:02d}") for w, t in ittl.product(self.wins, self.tops)]
-        return TFactorNames(n0)
+        n1 = [TFactorName(f"{self.factor_class}DIF")]
+        return TFactorNames(n0 + n1)
 
 
 @dataclass(frozen=True)
