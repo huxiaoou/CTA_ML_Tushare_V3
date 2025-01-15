@@ -1162,8 +1162,9 @@ class CFactorTAILS(CFactorRaw):
 
     def cal_tails_return(self, tday_minb_data: pd.DataFrame, ret: str) -> pd.Series:
         res = {}
-        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+        for win, factor_name in zip(self.cfg.wins, self.factor_names[:-1]):
             res[factor_name] = -tday_minb_data[ret].tail(win).mean() * 1e4
+        res[self.factor_names[-1]] = res[self.factor_names[0]] - res[self.factor_names[-2]]
         return pd.Series(res)
 
     def cal_factor_by_instru(

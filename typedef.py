@@ -592,7 +592,7 @@ class CCfgFactorTAILS(CCfgFactor):
 
     @property
     def factor_names(self) -> TFactorNames:
-        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins] + [TFactorName(f"{self.factor_class}DIF")]
         return TFactorNames(n0)
 
 
