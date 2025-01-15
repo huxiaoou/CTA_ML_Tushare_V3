@@ -139,7 +139,8 @@ class CCfgFactorRS(CCfgFactor):
     def factor_names(self) -> TFactorNames:
         rspa = [TFactorName(f"{self.factor_class}PA{w:03d}") for w in self.wins]
         rsla = [TFactorName(f"{self.factor_class}LA{w:03d}") for w in self.wins]
-        return TFactorNames(rspa + rsla)
+        rsdif = [TFactorName(f"{self.factor_class}DIF")]
+        return TFactorNames(rspa + rsla + rsdif)
 
 
 @dataclass(frozen=True)

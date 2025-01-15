@@ -157,6 +157,7 @@ class CFactorRS(CFactorRaw):
             s = adj_data["stock"] / la
             s[s == np.inf] = np.nan  # some maybe resulted from divided by Zero
             adj_data[rsla] = 1 - s
+        adj_data[f"{self.factor_class}DIF"] = adj_data["RSPA240"] - adj_data["RSPA060"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
         return factor_data
