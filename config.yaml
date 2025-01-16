@@ -149,15 +149,6 @@ universe:
   ZC.ZCE:
     sectorL0: C
     sectorL1: BLK
-#  FG.ZCE:
-#    sectorL0: C
-#    sectorL1: BLK
-#  SA.ZCE:
-#    sectorL0: C
-#    sectorL1: BLK
-#  UR.ZCE:
-#    sectorL0: C
-#    sectorL1: BLK
   AP.ZCE:
     sectorL0: C
     sectorL1: AGR
@@ -194,6 +185,9 @@ universe:
   # "PF.ZCE",
   # "PX.ZCE",
   # "SP.SHF",
+  # "FG.ZCE"
+  # "SA.ZCE"
+  # "UR.ZCE"
 
 available:
   win: 5
