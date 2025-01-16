@@ -125,12 +125,6 @@ universe:
   TA.ZCE:
     sectorL0: C
     sectorL1: CHM
-  PF.ZCE:
-    sectorL0: C
-    sectorL1: CHM
-  PX.ZCE:
-    sectorL0: C
-    sectorL1: CHM
   RB.SHF:
     sectorL0: C
     sectorL1: BLK
@@ -153,6 +147,15 @@ universe:
     sectorL0: C
     sectorL1: BLK
   ZC.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  FG.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  SA.ZCE:
+    sectorL0: C
+    sectorL1: BLK
+  UR.ZCE:
     sectorL0: C
     sectorL1: BLK
   AP.ZCE:
@@ -187,10 +190,9 @@ universe:
     sectorL1: AGR
 
   # "RR.DCE",
-  # "UR.ZCE",
-  # "FG.ZCE",
-  # "SA.ZCE",
   # "SH.ZCE",
+  # "PF.ZCE",
+  # "PX.ZCE",
   # "SP.SHF",
 
 available:
