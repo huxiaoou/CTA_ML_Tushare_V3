@@ -13,7 +13,7 @@ from typedef import (
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
-    CCfgFactorTOPS, CCfgFactorDOV, CCfgFactorRES, CCfgFactorVOL,
+    CCfgFactorTOPS, CCfgFactorDOV, CCfgFactorRES, CCfgFactorVOL, CCfgFactorMF,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1381,6 +1381,46 @@ class CFactorVOL(CFactorRaw):
         adj_data[f"{self.factor_class}DIF"] = adj_data["VOL001"] - adj_data["VOL010"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
+        return factor_data
+
+
+class CFactorMF(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorMF, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    @staticmethod
+    def cal_mf(tday_minb_data: pd.DataFrame, money: str, ret: str) -> float:
+        wgt = tday_minb_data[money] / tday_minb_data[money].sum()
+        sgn = tday_minb_data[ret].fillna(0)
+        mf = -wgt @ sgn
+        return mf
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max_win=max(self.cfg.wins), shift=-5)
+        adj_major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "vol_major", "return_c_major"],
+        )
+        adj_minb_data = self.load_minute_bar(instru, bgn_date=win_start_date, stp_date=stp_date)
+        adj_minb_data["freq_ret"] = adj_minb_data["close"] / adj_minb_data["pre_close"] - 1
+        mf_data = adj_minb_data.groupby(by="trade_date").apply(self.cal_mf, money="amount", ret="freq_ret")
+        input_data = pd.merge(
+            left=adj_major_data,
+            right=mf_data.reset_index().rename(columns={0: "mf"}),
+            on="trade_date",
+            how="left",
+        )
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            input_data[factor_name] = input_data["mf"].rolling(window=win).mean()
+        input_data[f"{self.factor_class}DIF"] = input_data["MF001"] - input_data["MF005"]
+        x, y = "MF001", "return_c_major"
+        input_data["beta"] = cal_rolling_beta(input_data, x=x, y=y, rolling_window=10)
+        input_data[f"{self.factor_class}RES"] = input_data[y] - input_data[x] * input_data["beta"]
+        self.rename_ticker(input_data)
+        factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data
 
 
