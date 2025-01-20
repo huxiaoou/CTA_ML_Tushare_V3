@@ -369,6 +369,7 @@ selected_factors_pool: [
   DOVMEAN05,
   TS120,
   RESDIF,
+  MFDIF,
 ]
 
 omega:
