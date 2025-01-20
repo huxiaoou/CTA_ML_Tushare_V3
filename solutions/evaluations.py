@@ -172,7 +172,7 @@ def main_evl_sims(
         ratio = ", ".join([f"{z:.4f}" for z in evl_data["sharpe+calmar"]])
         print(f"sharpe+calmar:({ret_prc})=({ratio})")
 
-    pd.set_option("display.max_rows", 40)
+    pd.set_option("display.max_rows", 500)
     pd.set_option("display.float_format", lambda z: f"{z:.4f}")
     print(evl_data)
 

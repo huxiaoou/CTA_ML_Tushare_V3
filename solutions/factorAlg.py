@@ -1359,20 +1359,26 @@ class CFactorVOL(CFactorRaw):
         self.cfg = cfg
         super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
 
+    @staticmethod
+    def __cal_volatility(ret: pd.Series, win: int) -> float:
+        return ret.values.reshape(-1, win).sum(axis=1).std() * np.sqrt(250 / win) * 100
+
     def cal_factor_by_instru(
             self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
     ) -> pd.DataFrame:
-        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
+        win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins + [120]), -5)
         adj_data = self.load_preprocess(
             instru, bgn_date=win_start_date, stp_date=stp_date,
             values=["trade_date", "ticker_major", "return_c_major"],
         )
         for win, factor_name in zip(self.cfg.wins, self.cfg.factor_names):
             volatility = f"v{win:03d}"
-            adj_data[volatility] = adj_data["return_c_major"].rolling(window=win).std() * 1e2
+            # adj_data[volatility] = adj_data["return_c_major"].rolling(window=win).std() * 1e2
             # adj_data[factor_name] = adj_data[volatility] / adj_data[volatility].rolling(window=10).mean() - 1
+            adj_data[volatility] = adj_data["return_c_major"].rolling(window=120).apply(
+                self.__cal_volatility, args=(win,))
             adj_data[factor_name] = adj_data[volatility]
-        adj_data[f"{self.factor_class}DIF"] = adj_data["VOL005"] - adj_data["VOL010"]
+        adj_data[f"{self.factor_class}DIF"] = adj_data["VOL001"] - adj_data["VOL010"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
         return factor_data
