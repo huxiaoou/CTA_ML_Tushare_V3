@@ -1370,7 +1370,8 @@ class CFactorVOL(CFactorRaw):
         for win, factor_name in zip(self.cfg.wins, self.cfg.factor_names):
             volatility = f"v{win:03d}"
             adj_data[volatility] = adj_data["return_c_major"].rolling(window=win).std() * 1e2
-            adj_data[factor_name] = adj_data[volatility] / adj_data[volatility].rolling(window=10).mean() - 1
+            # adj_data[factor_name] = adj_data[volatility] / adj_data[volatility].rolling(window=10).mean() - 1
+            adj_data[factor_name] = adj_data[volatility]
         adj_data[f"{self.factor_class}DIF"] = adj_data["VOL005"] - adj_data["VOL010"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
