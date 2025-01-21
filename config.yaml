@@ -366,7 +366,7 @@ selected_factors_pool: [
   SPDWEB40,
   COV030T05,
   TAILSDIF,
-  DOVMEAN05,
+#  DOVMEAN05,
   TS120,
   RESDIF,
   MFDIF,
