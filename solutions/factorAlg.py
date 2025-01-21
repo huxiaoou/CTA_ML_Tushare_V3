@@ -210,7 +210,7 @@ class CFactorTS(CFactorRaw):
         win_start_date = calendar.get_start_date(bgn_date, max(self.cfg.wins), -5)
         adj_data = self.load_preprocess(
             instru, bgn_date=win_start_date, stp_date=stp_date,
-            values=["trade_date", "ticker_major", "ticker_minor", "close_major", "close_minor"],
+            values=["trade_date", "ticker_major", "ticker_minor", "close_major", "close_minor", "return_c_major"],
         )
         adj_data[["ticker_major", "ticker_minor"]] = adj_data[["ticker_major", "ticker_minor"]].fillna("")
         adj_data["ts"] = adj_data.apply(
@@ -223,6 +223,9 @@ class CFactorTS(CFactorRaw):
             f1 = f"{self.factor_class}D{win:03d}"
             adj_data[f0] = adj_data["ts"].rolling(window=win, min_periods=int(2 * win / 3)).mean()
             adj_data[f1] = adj_data["ts"] - adj_data[f0]
+        x, y = "ts", "return_c_major"
+        adj_data["beta"] = cal_rolling_beta(adj_data, x=x, y=y, rolling_window=10)
+        adj_data[f"{self.factor_class}RES"] = adj_data[y] - adj_data[x] * adj_data["beta"]
         self.rename_ticker(adj_data)
         factor_data = self.get_factor_data(adj_data, bgn_date)
         return factor_data

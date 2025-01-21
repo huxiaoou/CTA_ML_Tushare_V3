@@ -170,7 +170,8 @@ class CCfgFactorTS(CCfgFactor):
     def factor_names(self) -> TFactorNames:
         n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
         n1 = [TFactorName(f"{self.factor_class}D{w:03d}") for w in self.wins]
-        return TFactorNames(n0 + n1)
+        n2 = [TFactorName(f"{self.factor_class}RES")]
+        return TFactorNames(n0 + n1 + n2)
 
 
 @dataclass(frozen=True)
