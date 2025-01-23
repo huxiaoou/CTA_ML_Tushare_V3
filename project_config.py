@@ -44,6 +44,7 @@ from typedef import (
     CCfgFactorRES,
     CCfgFactorVOL,
     CCfgFactorMF,
+    CCfgFactorRV,
     CCfgFactorTA,
 )
 
@@ -229,6 +230,7 @@ cfg_factors = CCfgFactors(
     RES=CCfgFactorRES(**proj_cfg.factors["RES"]),
     VOL=CCfgFactorVOL(**proj_cfg.factors["VOL"]),
     MF=CCfgFactorMF(**proj_cfg.factors["MF"]),
+    RV=CCfgFactorRV(**proj_cfg.factors["RV"]),
 )
 
 if __name__ == "__main__":

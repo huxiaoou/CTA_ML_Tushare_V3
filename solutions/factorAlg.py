@@ -13,7 +13,7 @@ from typedef import (
     CCfgFactorCOV,
     CCfgFactorNOI, CCfgFactorNDOI, CCfgFactorWNOI, CCfgFactorWNDOI, CCfgFactorSPDWEB,
     CCfgFactorAMP, CCfgFactorEXR, CCfgFactorSMT, CCfgFactorRWTC, CCfgFactorTAILS, CCfgFactorHEADS,
-    CCfgFactorTOPS, CCfgFactorDOV, CCfgFactorRES, CCfgFactorVOL, CCfgFactorMF,
+    CCfgFactorTOPS, CCfgFactorDOV, CCfgFactorRES, CCfgFactorVOL, CCfgFactorMF, CCfgFactorRV,
     CCfgFactorTA, CCfgFactorSIZE, CCfgFactorHR, CCfgFactorSR, CCfgFactorLIQUIDITY, CCfgFactorVSTD
 )
 from solutions.factor import CFactorRaw
@@ -1422,6 +1422,51 @@ class CFactorMF(CFactorRaw):
         x, y = "MF001", "return_c_major"
         input_data["beta"] = cal_rolling_beta(input_data, x=x, y=y, rolling_window=10)
         input_data[f"{self.factor_class}RES"] = input_data[y] - input_data[x] * input_data["beta"]
+        self.rename_ticker(input_data)
+        factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
+        return factor_data
+
+
+class CFactorRV(CFactorRaw):
+    def __init__(self, cfg: CCfgFactorRV, **kwargs):
+        self.cfg = cfg
+        super().__init__(factor_class=cfg.factor_class, factor_names=cfg.factor_names, **kwargs)
+
+    @staticmethod
+    def __cal_rv(tday_minb_data: pd.DataFrame, ret: str) -> float:
+        ret_srs = tday_minb_data[ret].fillna(0) * 1000
+        rv_pos = ret_srs @ ret_srs.where(ret_srs > 0, 0)
+        rv_neg = ret_srs @ ret_srs.where(ret_srs < 0, 0)
+        if (s := rv_pos + rv_neg) > 0:
+            return (rv_pos - rv_neg) / s
+        else:
+            return np.nan
+
+    def cal_factor_by_instru(
+            self, instru: str, bgn_date: str, stp_date: str, calendar: CCalendar
+    ) -> pd.DataFrame:
+        win_start_date = calendar.get_start_date(bgn_date, max_win=max(self.cfg.wins + [60]), shift=-5)
+        adj_major_data = self.load_preprocess(
+            instru, bgn_date=win_start_date, stp_date=stp_date,
+            values=["trade_date", "ticker_major", "return_c_major"],
+        )
+        adj_minb_data = self.load_minute_bar(instru, bgn_date=win_start_date, stp_date=stp_date)
+        adj_minb_data["freq_ret"] = adj_minb_data["close"] / adj_minb_data["pre_close"] - 1
+        rv_data = adj_minb_data.groupby(by="trade_date").apply(self.__cal_rv, ret="freq_ret")
+        input_data = pd.merge(
+            left=adj_major_data,
+            right=rv_data.reset_index().rename(columns={0: "rv"}),
+            on="trade_date",
+            how="left",
+        )
+        for win, factor_name in zip(self.cfg.wins, self.factor_names):
+            input_data[factor_name] = input_data["rv"].rolling(window=win).mean()
+        input_data[f"{self.factor_class}DIF"] = input_data["RV001"] - input_data["RV020"]
+        xp, x, y = "RV020", "x", "return_c_major"
+        input_data[x] = input_data[xp].shift(1)
+        input_data["beta"] = cal_rolling_beta(input_data, x=x, y=y, rolling_window=60)
+        input_data["alpha"] = input_data[y] - input_data[x] * input_data["beta"]
+        input_data[f"{self.factor_class}PRD"] = input_data[xp] * input_data["beta"] + input_data["alpha"]
         self.rename_ticker(input_data)
         factor_data = self.get_factor_data(input_data, bgn_date=bgn_date)
         return factor_data

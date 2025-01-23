@@ -58,6 +58,7 @@ python main.py --bgn $bgn_date --stp $stp_date factor --fclass DOV
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass RES
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass VOL
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass MF
+python main.py --bgn $bgn_date --stp $stp_date factor --fclass RV
 python main.py --bgn $bgn_date --stp $stp_date factor --fclass TA
 
 # --- single factor test

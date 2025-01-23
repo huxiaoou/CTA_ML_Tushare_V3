@@ -689,6 +689,21 @@ class CCfgFactorMF(CCfgFactor):
 
 
 @dataclass(frozen=True)
+class CCfgFactorRV(CCfgFactor):
+    wins: list[int]
+
+    @property
+    def factor_class(self) -> TFactorClass:
+        return TFactorClass("RV")
+
+    @property
+    def factor_names(self) -> TFactorNames:
+        n0 = [TFactorName(f"{self.factor_class}{w:03d}") for w in self.wins]
+        n1 = [TFactorName(f"{self.factor_class}DIF"), TFactorName(f"{self.factor_class}PRD")]
+        return TFactorNames(n0 + n1)
+
+
+@dataclass(frozen=True)
 class CCfgFactorTA(CCfgFactor):
     macd: tuple[int, int, int]
     bbands: tuple[int, int, int]
@@ -830,6 +845,7 @@ class CCfgFactors:
     RES: CCfgFactorRES | None
     VOL: CCfgFactorVOL | None
     MF: CCfgFactorMF | None
+    RV: CCfgFactorRV | None
     TA: CCfgFactorTA | None
 
     def values(self) -> list[CCfgFactor]:
