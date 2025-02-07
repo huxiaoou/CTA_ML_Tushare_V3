@@ -197,6 +197,7 @@ def plot_sim_args_list(
         colormap: str = "jet",
         line_style: list[str] = None,
         line_color: list[str] = None,
+        vlines_index: list[str] = None,
 ):
     check_and_makedirs(plt_save_dir)
     ret_data_by_sim = {}
@@ -219,7 +220,8 @@ def plot_sim_args_list(
     artist.plot()
     artist.set_legend()
     artist.set_axis_x(xtick_count=20, xtick_label_size=8)
-    artist.add_vlines_from_index(vlines_index=["20240102", "20240902"], color="k")
+    if vlines_index:
+        artist.add_vlines_from_index(vlines_index=vlines_index, color="k")
     artist.save_and_close(dpi=500)
     return 0
 
@@ -230,6 +232,7 @@ def main_plt_grouped_sim_args(
         plt_save_dir: str,
         bgn_date: str,
         stp_date: str,
+        vlines_index: list[str] = None,
 ):
     for grp_id, sim_args_list in track(grouped_sim_args.items(), description="Plot by group id"):
         if isinstance(grp_id, tuple):
@@ -245,5 +248,6 @@ def main_plt_grouped_sim_args(
             plt_save_dir=plt_save_dir,
             bgn_date=bgn_date,
             stp_date=stp_date,
+            vlines_index=vlines_index,
         )
     return 0

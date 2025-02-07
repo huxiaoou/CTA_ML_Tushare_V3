@@ -787,7 +787,8 @@ if __name__ == "__main__":
                 plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_opt_dir, "plot-nav"),
                 bgn_date=bgn_date, stp_date=stp_date,
                 line_style=["-.", "-.", "-"],
-                line_color=["#000080", "#006400", "#8B0000"]
+                line_color=["#000080", "#006400", "#8B0000"],
+                vlines_index=["20231229", "20240902", "20241231"],
             )
         elif args.type == "mdlPrd":
             from solutions.mclrn_mdl_parser import load_config_models
