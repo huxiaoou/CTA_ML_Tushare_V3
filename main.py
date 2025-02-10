@@ -790,6 +790,15 @@ if __name__ == "__main__":
                 line_color=["#000080", "#006400", "#8B0000"],
                 vlines_index=["20231229", "20240902", "20241231"],
             )
+            plot_sim_args_list(
+                fig_name="Cls.Opn.Omega.since_2025",
+                sim_args_list=sim_args_list,
+                sim_save_dir=proj_cfg.sim_frm_fac_opt_dir,
+                plt_save_dir=os.path.join(proj_cfg.evl_frm_fac_opt_dir, "plot-nav"),
+                bgn_date="20250102", stp_date=stp_date,
+                line_style=["-.", "-.", "-"],
+                line_color=["#000080", "#006400", "#8B0000"],
+            )
         elif args.type == "mdlPrd":
             from solutions.mclrn_mdl_parser import load_config_models
             from solutions.shared import gen_model_tests, get_sim_args_mdl_prd, group_sim_args_by_ret_prc
