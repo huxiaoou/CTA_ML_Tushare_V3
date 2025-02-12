@@ -1395,7 +1395,7 @@ class CFactorMF(CFactorRaw):
     @staticmethod
     def cal_mf(tday_minb_data: pd.DataFrame, money: str, ret: str) -> float:
         wgt = tday_minb_data[money] / tday_minb_data[money].sum()
-        sgn = tday_minb_data[ret].fillna(0)
+        sgn = tday_minb_data[ret].fillna(0) * 1e4
         mf = -wgt @ sgn
         return mf
 
