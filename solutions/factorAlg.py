@@ -885,7 +885,7 @@ class CFactorLIQUIDITY(CFactorRaw):
             values=["trade_date", "ticker_major", "return_c_major", "amount_major"],
         )
         liquidity_id = "liquidity"
-        major_data[liquidity_id] = major_data["return_c_major"] * 1e8 / major_data["amount_major"]
+        major_data[liquidity_id] = major_data["return_c_major"] * 1e10 / major_data["amount_major"]
         for win, factor_name in zip(self.cfg.wins, self.factor_names):
             major_data[factor_name] = major_data[liquidity_id].rolling(window=win, min_periods=int(win * 0.3)).mean()
         self.rename_ticker(major_data)
